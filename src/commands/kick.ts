@@ -1,14 +1,24 @@
-import Player from '../player/Player';
+import { connectedPlayers } from '..';
 import Command from './Command';
 
-const command = new Command('kickme', 'Kick yourself from the websocket');
+const command = new Command('kick', 'Kick someone from the websocket');
 
-command.setHandler((player) => {
-  if (!(player instanceof Player)) {
-    player.sendConsoleMessage('You must be a player to execute this command');
-    return;
-  }
-  player.removePlayer();
+command.help = `usage: kick <player>`;
+
+command.setHandler(async (player, command, args) => {
+    if (!args.length) {
+        player.sendConsoleMessage('You must specify a player to kick');
+        return;
+    }
+
+    const target = connectedPlayers.find(p => p.username === args[0]);
+    if (!target) {
+        player.sendConsoleMessage(`Player ${args[0]} not found`);
+        return;
+    }
+
+    target.removePlayer();
+    player.sendConsoleMessage(`Kicked ${target.username}`);
 });
 
 export default command;
