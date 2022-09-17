@@ -2,6 +2,7 @@ import { Express } from 'express';
 import actionRouter from './routes/action';
 import broadcastRouter from './routes/broadcast';
 import chatMessageRouter from './routes/chatMessage';
+import customCosmeticsRounter from './routes/customCosmetics';
 import dashboard from './routes/dashboard';
 import displayColorRouter from './routes/displayColor';
 import keyRouter from './routes/key';
@@ -18,6 +19,7 @@ export default function registerRoutes(app: Express): void {
   app.use('/api/chatMessage', chatMessageRouter);
   app.use('/api/players', playersRouter);
   app.use('/api/displayColor', displayColorRouter);
+  app.use('/api/customCosmetics', customCosmeticsRounter);
 
   app.use('/dashboard', dashboard);
 

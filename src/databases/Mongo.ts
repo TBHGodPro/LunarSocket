@@ -1,4 +1,5 @@
 import { Collection, MongoClient } from 'mongodb';
+import { CustomCosmetic } from '../api/routes/customCosmetics';
 import Player, { DatabasePlayer } from '../player/Player';
 import CallQueue from '../utils/CallQueue';
 import getConfig from '../utils/config';
@@ -8,7 +9,8 @@ import Database from './Database';
 export default class Mongo extends Database {
   private isConnected: boolean;
   private client: MongoClient;
-  private collection: Collection;
+  private playerCollection: Collection;
+  private customCosmeticsCollection: Collection;
   private queue: CallQueue<
     { uuid: string; player: DatabasePlayer },
     (player: { uuid: string; player: DatabasePlayer }) => Promise<void>
@@ -32,7 +34,8 @@ export default class Mongo extends Database {
     this.client = new MongoClient(config.database.config.mongo);
     await this.client.connect();
     const db = this.client.db('LunarSocket');
-    this.collection = db.collection('players');
+    this.playerCollection = db.collection('players');
+    this.customCosmeticsCollection = db.collection('customCosmetics');
 
     this.isConnected = true;
     logger.log('Connected to MongoDB');
@@ -66,7 +69,7 @@ export default class Mongo extends Database {
     const existingPlayer = await this.getPlayer(uuid);
 
     if (existingPlayer)
-      this.collection.updateOne(
+      this.playerCollection.updateOne(
         { uuid: uuid },
         {
           $set: player,
@@ -75,7 +78,7 @@ export default class Mongo extends Database {
         }
       );
     else
-      await this.collection.insertOne({
+      await this.playerCollection.insertOne({
         // Mango specific data, used to get the player
         uuid: uuid,
         ...player,
@@ -83,10 +86,16 @@ export default class Mongo extends Database {
   }
 
   public async getPlayer(uuid: string): Promise<DatabasePlayer> {
-    return await this.collection.findOne<DatabasePlayer>({ uuid });
+    return await this.playerCollection.findOne<DatabasePlayer>({ uuid });
   }
 
   public async getPlayerCount(): Promise<number> {
-    return await this.collection.countDocuments();
+    return await this.playerCollection.countDocuments();
+  }
+
+  public async getCustomCosmetics(): Promise<CustomCosmetic[]> {
+    return (await this.customCosmeticsCollection
+      .find()
+      .toArray()) as unknown as CustomCosmetic[];
   }
 }

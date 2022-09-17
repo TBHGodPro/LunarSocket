@@ -1,3 +1,4 @@
+import { CustomCosmetic } from '../api/routes/customCosmetics';
 import Player, { DatabasePlayer } from '../player/Player';
 
 export default class Database {
@@ -19,6 +20,11 @@ export default class Database {
 
   public async getPlayerCount(): Promise<number> {
     console.warn('Database#getPlayerCount is not implemented');
+    return null;
+  }
+
+  public async getCustomCosmetics(): Promise<CustomCosmetic[]> {
+    console.warn('Database#getCustomCosmetics is not implemented');
     return null;
   }
 }

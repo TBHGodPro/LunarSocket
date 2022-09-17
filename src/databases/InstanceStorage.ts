@@ -1,12 +1,15 @@
+import { CustomCosmetic } from '../api/routes/customCosmetics';
 import Player, { DatabasePlayer } from '../player/Player';
 import Database from './Database';
 
 export default class InstanceStorage extends Database {
   private database: Map<string, DatabasePlayer>;
+  private customCosmetics: CustomCosmetic[];
 
   public constructor() {
     super();
     this.database = new Map<string, DatabasePlayer>();
+    this.customCosmetics = [];
   }
 
   public async setPlayer(player: Player): Promise<void> {
@@ -26,5 +29,9 @@ export default class InstanceStorage extends Database {
 
   public async getPlayerCount(): Promise<number> {
     return Object.keys(this.database).length;
+  }
+
+  public async getCustomCosmetics(): Promise<CustomCosmetic[]> {
+    return this.customCosmetics;
   }
 }

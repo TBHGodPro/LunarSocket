@@ -1,6 +1,7 @@
 import { RedisClientType } from '@redis/client';
 import redisJson from '@redis/json';
 import { createClient } from 'redis';
+import { CustomCosmetic } from '../api/routes/customCosmetics';
 import Player, { DatabasePlayer } from '../player/Player';
 import CallQueue from '../utils/CallQueue';
 import getConfig from '../utils/config';
@@ -84,5 +85,11 @@ export default class Redis extends Database {
 
   public async getPlayerCount(): Promise<number> {
     return await this.client.dbSize();
+  }
+
+  public async getCustomCosmetics(): Promise<CustomCosmetic[]> {
+    return (await this.client.json.get(
+      'customCosmetics'
+    )) as unknown as CustomCosmetic[];
   }
 }

@@ -1,4 +1,5 @@
 import { readFile, stat, writeFile } from 'node:fs/promises';
+import { CustomCosmetic } from '../api/routes/customCosmetics';
 import Player, { DatabasePlayer } from '../player/Player';
 import getConfig from '../utils/config';
 import logger from '../utils/logger';
@@ -6,7 +7,7 @@ import Database from './Database';
 
 export default class FileStorage extends Database {
   private filePath: string;
-  private file: { [key: string]: DatabasePlayer };
+  private file: { [key: string]: DatabasePlayer | CustomCosmetic[] };
 
   public constructor() {
     super();
@@ -20,7 +21,9 @@ export default class FileStorage extends Database {
 
   private async init(): Promise<void> {
     this.filePath = (await getConfig()).database.config.filePath;
-    this.file = {};
+    this.file = {
+      customCosmetics: [],
+    };
 
     if (!(await stat(this.filePath).catch(() => undefined))) {
       await this.writeFile();
@@ -47,10 +50,14 @@ export default class FileStorage extends Database {
   }
 
   public async getPlayer(uuid: string): Promise<DatabasePlayer> {
-    return this.file[uuid];
+    return this.file[uuid] as DatabasePlayer;
   }
 
   public async getPlayerCount(): Promise<number> {
     return Object.keys(this.file).length;
+  }
+
+  public async getCustomCosmetics(): Promise<CustomCosmetic[]> {
+    return this.file.customCosmetics as CustomCosmetic[];
   }
 }
