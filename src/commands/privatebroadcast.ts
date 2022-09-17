@@ -1,6 +1,6 @@
+import { connectedPlayers } from '..';
 import logger from '../utils/logger';
 import Command from './Command';
-import { connectedPlayers } from '..';
 
 const command = new Command(
   'privatebroadcast',
@@ -9,10 +9,10 @@ const command = new Command(
 
 command.help = `usage: privatebroadcast <player> <message>`;
 
-command.setHandler(async (player, command, args) => {
+command.setHandler((player, command, args) => {
   let title = '';
   let message = args.slice(1).join(' ');
-  let target = args[0];
+  const target = args[0];
 
   if (message.includes('||')) {
     const split = message.split('||');

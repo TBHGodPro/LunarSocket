@@ -5,7 +5,7 @@ export const stats = {
 };
 
 function onlineListener(): void {
-  setInterval(async () => {
+  setInterval(() => {
     const date = new Date();
     const key = `${date.getHours()}:${date.getMinutes()}`;
     stats.onlinePlayers[key] = connectedPlayers.length;

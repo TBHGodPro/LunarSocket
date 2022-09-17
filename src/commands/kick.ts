@@ -5,7 +5,7 @@ const command = new Command('kick', 'Kick someone from the websocket');
 
 command.help = `usage: kick <player>`;
 
-command.setHandler(async (player, command, args) => {
+command.setHandler((player, command, args) => {
   if (!args.length) {
     player.sendConsoleMessage('You must specify a player to kick');
     return;
