@@ -36,7 +36,7 @@ $ npm run init # Execute the init script
 or (Linux only)
 
 ```bash
-curl https://github.com/Solar-Tweaks/LunarSocket/raw/main/install.sh | bash
+curl https://raw.githubusercontent.com/Solar-Tweaks/LunarSocket/main/install.sh | bash
 ```
 
 or
