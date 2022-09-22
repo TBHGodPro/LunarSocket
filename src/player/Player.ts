@@ -82,7 +82,7 @@ export default class Player {
     for (let i = 0; i < 240; i++) this.emotes.owned.fake.push(i);
 
     // Yes, we're giving cosmetics out of nowhere again
-    for (let i = 1; i < 3235; i++)
+    for (let i = 1; i < 3331; i++)
       this.cosmetics.fake.push({ id: i, equipped: false });
 
     const handleIncomingMessage = async (data: Buffer) => {
