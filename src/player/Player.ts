@@ -46,6 +46,7 @@ export default class Player {
   private disconnected: boolean;
   private socket: WebSocket;
   private fakeSocket: WebSocket;
+  private fakeSocketAuthed: boolean;
   private outgoingPacketHandler: OutgoingPacketHandler;
   private incomingPacketHandler: IncomingPacketHandler;
 
@@ -75,6 +76,7 @@ export default class Player {
     };
 
     this.disconnected = false;
+    this.fakeSocketAuthed = false;
     this.socket = socket;
     this.outgoingPacketHandler = new OutgoingPacketHandler(this);
     this.incomingPacketHandler = new IncomingPacketHandler(this);
@@ -105,7 +107,7 @@ export default class Player {
 
     // Forwarding data
     this.socket.on('message', (data: Buffer) => {
-      if (this.fakeSocket instanceof WebSocket) {
+      if (this.fakeSocketAuthed) {
         handleIncomingMessage(data);
       } else incomingMessageQueue.push([data]);
     });
@@ -175,10 +177,10 @@ export default class Player {
       logger.log(this.username, 'connected!');
       events.push({ type: 'login', value: this.username });
 
-      this.fakeSocket.once(
-        'message',
-        async () => await incomingMessageQueue.emptyQueue()
-      );
+      this.fakeSocket.once('message', async () => {
+        await incomingMessageQueue.emptyQueue();
+        this.fakeSocketAuthed = true;
+      });
 
       this.fakeSocket.on('message', (data) => {
         // Trying to handle packet
