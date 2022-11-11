@@ -193,7 +193,7 @@ export default class Player {
       this.fakeSocket.on('close', () => {
         this.removePlayer();
       });
-      this.fakeSocket.on('error', (error) => {
+      this.fakeSocket.on('error', () => {
         this.removePlayer();
       });
 
