@@ -117,8 +117,7 @@ export default class Player {
       this.removePlayer();
     });
 
-    this.socket.on('error', (error) => {
-      logger.error(error);
+    this.socket.on('error', () => {
       this.removePlayer();
     });
 
@@ -195,7 +194,6 @@ export default class Player {
         this.removePlayer();
       });
       this.fakeSocket.on('error', (error) => {
-        logger.error(error);
         this.removePlayer();
       });
 
