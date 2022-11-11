@@ -63,9 +63,16 @@ server.on('connection', async (socket, request) => {
     'showHatsOverSkinLayer',
     'username',
     'version',
+    'flipShoulderPet',
+    'ichorModules',
+    'showOverBoots',
+    'showOverChestplate',
+    'showOverLeggings',
   ]) {
-    handshake[header] = getHeader(header);
+    handshake[header] = getHeader(header) ?? '';
   }
+
+  handshake.Host = 'assetserver.lunarclientprod.com';
 
   // Ignoring players with older/newer protocol versions
   if (handshake.protocolVersion !== '8')

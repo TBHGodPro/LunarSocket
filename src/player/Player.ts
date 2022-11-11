@@ -447,6 +447,12 @@ export interface Handshake {
   showHatsOverSkinlayer: string;
   username: string;
   version: string;
+  Host: string;
+  flipShoulderPet: string;
+  ichorModules: string;
+  showOverBoots: string;
+  showOverChestplate: string;
+  showOverLeggings: string;
 }
 
 type RealFake<T> = { real: T; fake: T };
