@@ -1,4 +1,5 @@
 import { readFile, stat, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { CustomCosmetic } from '../api/routes/customCosmetics';
 import Player, { DatabasePlayer } from '../player/Player';
 import getConfig from '../utils/config';
@@ -20,7 +21,12 @@ export default class FileStorage extends Database {
   }
 
   private async init(): Promise<void> {
-    this.filePath = (await getConfig()).database.config.filePath;
+    this.filePath =
+      (await getConfig().then((data) =>
+        data.database.config.filePath.startsWith('.')
+          ? join(process.cwd(), data.database.config.filePath)
+          : data.database.config.filePath
+      )) || join(process.cwd(), 'storage.json');
     this.file = {
       customCosmetics: [],
     };
@@ -38,7 +44,7 @@ export default class FileStorage extends Database {
   }
 
   public async setPlayer(player: Player): Promise<void> {
-    this.setPlayerRaw(player.uuid, player.getDatabasePlayer());
+    await this.setPlayerRaw(player.uuid, player.getDatabasePlayer());
   }
 
   public async setPlayerRaw(
@@ -49,15 +55,29 @@ export default class FileStorage extends Database {
     await this.writeFile();
   }
 
-  public async getPlayer(uuid: string): Promise<DatabasePlayer> {
+  public getPlayer(uuid: string): DatabasePlayer {
     return this.file[uuid] as DatabasePlayer;
   }
 
-  public async getPlayerCount(): Promise<number> {
-    return Object.keys(this.file).length;
+  public getPlayerCount(): number {
+    // `- 1` because of the `customCosmetics` key
+    return Object.keys(this.file).length - 1;
   }
 
-  public async getCustomCosmetics(): Promise<CustomCosmetic[]> {
+  public getCustomCosmetics(): CustomCosmetic[] {
     return this.file.customCosmetics as CustomCosmetic[];
+  }
+
+  public getRoleDistribution(): { [role: string]: number } {
+    const roles = {};
+    for (const role of Object.values(this.file).map((user) =>
+      Array.isArray(user) ? 'default' : user.role
+    )) {
+      if (role !== 'default') {
+        roles[role] ??= 0;
+        roles[role]++;
+      }
+    }
+    return roles;
   }
 }

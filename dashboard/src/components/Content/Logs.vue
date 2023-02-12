@@ -1,7 +1,7 @@
 <template>
   <div id="container" :style="`height: ${containerHeight}px`">
     <div id="header">
-      <h3>Connected Players: {{ $store.state.stats.onlinePlayers }}</h3>
+      <h3>Log Entries: {{ $store.state.stats.events.length }}</h3>
       <div>
         <label for="limit">Show </label>
         <select name="limit" id="limit" @change="updateList()" v-model="limit">
@@ -12,12 +12,11 @@
       </div>
     </div>
     <div id="content" :style="`height: ${containerHeight - 85}px`">
-      <PlayerComponent
-        v-for="player of players"
-        :key="player.uuid"
-        :name="player.username"
-        :uuid="player.uuid"
-        :role="player.role"
+      <EventComponent
+        v-for="event of events"
+        :key="event.value"
+        :type="event.type"
+        :value="event.value"
       />
     </div>
   </div>
@@ -25,16 +24,15 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/runtime-core';
-import PlayerComponent from '../Dashboard/Player.vue';
-import { Player } from '../../store';
+import EventComponent from '../Dashboard/Event.vue';
 
 export default defineComponent({
-  name: 'Players',
-  components: { PlayerComponent },
+  name: 'Logs',
+  components: { EventComponent },
   data: () => ({
     limit: 25,
     limitOptions: [25, 50, 75, 100, 150, 200, 300, 500, 1000],
-    players: [] as Player[],
+    events: [] as { type: string; value: any }[],
     containerHeight: 500,
   }),
 
@@ -44,9 +42,9 @@ export default defineComponent({
     },
     updateList() {
       // @ts-ignore
-      this.players = [...this.$store.state.players];
-      this.players.length = this.limit;
-      this.players = this.players.filter((p) => p);
+      this.events = [...this.$store.state.stats.events];
+      this.events.length = this.limit;
+      this.events = this.events.filter((p) => p);
     },
   },
 
@@ -82,6 +80,16 @@ select {
 div#content {
   height: 80%;
   overflow-y: scroll;
+  margin-left: 5%;
+}
+
+div.event-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: 80px;
+  width: 80%;
+  margin-bottom: 10px;
 }
 
 div#content::-webkit-scrollbar {

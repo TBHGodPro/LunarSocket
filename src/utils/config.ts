@@ -22,12 +22,14 @@ export function initConfig(): Config {
   return getConfigSync();
 }
 
-export default async function getConfig(): Promise<Config> {
+export async function getConfig(): Promise<Config> {
   return mergeObjects(
     defaultConfig,
     JSON.parse(await readFile(configPath, 'utf-8'))
   );
 }
+
+export default getConfig;
 
 export function getConfigSync(): Config {
   return mergeObjects(
@@ -65,8 +67,6 @@ const defaultConfig = {
     config: {
       mongo: 'mongodb://<password>@localhost:27017',
       filePath: 'FileStorage.json',
-      redis: 'redis://alice:foobared@awesome.redis.server:6380',
-      redisDatabase: 0,
     },
   },
   blacklist: {

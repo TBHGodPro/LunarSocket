@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="header">
-      <h2>{{ $props.text }}</h2>
-      <h2>
+      <h2 class="title">{{ $props.text }}</h2>
+      <h2 class="value">
         {{ $props.displayvalue ? $props.displayvalue : `${currentValue}%` }}
       </h2>
     </div>
@@ -63,6 +63,20 @@ div.header {
 h2 {
   font-size: 14px;
   line-height: 16px;
+}
+
+h2.title {
+  color: var(--color-gray);
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+}
+
+h2.value {
+  color: var(--color-gray);
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 1px;
 }
 
 div.container {

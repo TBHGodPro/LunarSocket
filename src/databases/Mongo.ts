@@ -54,7 +54,7 @@ export default class Mongo extends Database {
   }
 
   public async setPlayer(player: Player): Promise<void> {
-    this.setPlayerRaw(player.uuid, player.getDatabasePlayer());
+    return await this.setPlayerRaw(player.uuid, player.getDatabasePlayer());
   }
 
   public async setPlayerRaw(
@@ -64,25 +64,25 @@ export default class Mongo extends Database {
     // If not connected, push the player instance into the queue
     // Once the connection will be established, the setPlayer
     // method will be called again with the player instance
-    if (!this.isConnected) return void this.queue.push([{ uuid, player }]);
+    if (!this.isConnected) return this.queue.push([{ uuid, player }]);
 
     const existingPlayer = await this.getPlayer(uuid);
 
     if (existingPlayer)
-      this.playerCollection.updateOne(
-        { uuid: uuid },
+      return (await this.playerCollection.updateOne(
+        { uuid },
         {
           $set: player,
           // Removing all fields
           $unset: { color: null, plusColor: null, premium: null },
         }
-      );
+      )) as unknown as void;
     else
-      await this.playerCollection.insertOne({
+      return (await this.playerCollection.insertOne({
         // Mango specific data, used to get the player
-        uuid: uuid,
+        uuid,
         ...player,
-      });
+      })) as unknown as void;
   }
 
   public async getPlayer(uuid: string): Promise<DatabasePlayer> {
@@ -97,5 +97,20 @@ export default class Mongo extends Database {
     return (await this.customCosmeticsCollection
       .find()
       .toArray()) as unknown as CustomCosmetic[];
+  }
+
+  public async getRoleDistribution(): Promise<{ [role: string]: number }> {
+    const roleNames = Object.keys((await getConfig()).roles).filter(
+      (role) => role !== 'default'
+    );
+    const roles = {};
+    await Promise.all(
+      roleNames.map((role) =>
+        this.playerCollection.countDocuments({ role }).then((amount) => {
+          roles[role] = amount;
+        })
+      )
+    );
+    return roles;
   }
 }

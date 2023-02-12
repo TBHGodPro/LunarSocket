@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <img class="avatar" :src="`https://cravatar.eu/avatar/${uuid}`" />
     <div class="infos">
       <h5>{{ name }}</h5>
       <p>{{ uuid }}</p>
@@ -8,17 +9,17 @@
     <div class="actions">
       <div
         class="player-action"
-        style="background-color: rgba(253, 34, 84, 0.1)"
+        style="background-color: rgba(84, 200, 119, 0.1)"
         @click="sendMessage()"
       >
-        <i class="fa-solid fa-message" style="color: rgb(253, 34, 84)"></i>
+        <i class="fa-solid fa-message" style="color: rgb(84, 200, 119)"></i>
       </div>
       <div
         class="player-action"
-        style="background-color: rgba(85, 31, 255, 0.1)"
+        style="background-color: rgba(59, 161, 219, 0.2)"
         @click="setRole()"
       >
-        <i class="fa-solid fa-user-gear" style="color: rgb(85, 31, 255)"></i>
+        <i class="fa-solid fa-user-gear" style="color: rgb(59, 161, 219)"></i>
       </div>
     </div>
   </div>
@@ -55,12 +56,12 @@ export default defineComponent({
 
 <style scoped>
 div.container {
-  background-color: white;
-  box-shadow: 0px 18px 32px rgba(208, 210, 218, 0.15);
   height: 60px;
   border-radius: 15px;
   margin: 5px 20px;
   display: flex;
+  padding-left: 10px;
+  justify-content: center;
 }
 
 div.infos {
@@ -71,17 +72,19 @@ div.infos > *,
 div.actions > * {
   margin: auto 0 auto 0;
   text-align: center;
+  color: var(--color-light-gray);
 }
 
 div.infos > h5 {
-  font-weight: normal;
+  font-weight: 600;
   width: 250px;
+    color: var(--color-light-gray);
 }
 
 div.infos > p {
-  color: var(--color-dark-gray);
   font-size: 16px;
   width: 400px;
+  color: var(--color-gray);
 }
 
 div.infos > h6 {
@@ -91,6 +94,8 @@ div.infos > h6 {
 
 div.actions {
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 div.player-action {
@@ -103,5 +108,13 @@ div.player-action {
 
 div.player-action > i {
   margin-top: 16px;
+}
+
+img.avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  margin-top: 8px;
+  margin-left: 5px;
 }
 </style>

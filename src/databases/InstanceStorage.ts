@@ -12,26 +12,34 @@ export default class InstanceStorage extends Database {
     this.customCosmetics = [];
   }
 
-  public async setPlayer(player: Player): Promise<void> {
+  public setPlayer(player: Player): void {
     this.setPlayerRaw(player.uuid, player.getDatabasePlayer());
   }
 
-  public async setPlayerRaw(
-    uuid: string,
-    player: DatabasePlayer
-  ): Promise<void> {
+  public setPlayerRaw(uuid: string, player: DatabasePlayer): void {
     this.database.set(uuid, player);
   }
 
-  public async getPlayer(uuid: string): Promise<DatabasePlayer> {
+  public getPlayer(uuid: string): DatabasePlayer {
     return this.database.get(uuid);
   }
 
-  public async getPlayerCount(): Promise<number> {
+  public getPlayerCount(): number {
     return Object.keys(this.database).length;
   }
 
-  public async getCustomCosmetics(): Promise<CustomCosmetic[]> {
+  public getCustomCosmetics(): CustomCosmetic[] {
     return this.customCosmetics;
+  }
+
+  public getRoleDistribution(): { [role: string]: number } {
+    const roles = {};
+    for (const role of [...this.database.values()].map((user) => user.role)) {
+      if (role !== 'default') {
+        roles[role] ??= 0;
+        roles[role]++;
+      }
+    }
+    return roles;
   }
 }

@@ -25,28 +25,64 @@ export default defineComponent({
 
   created() {
     switch (this.$props.type) {
-      case 'login':
+      case 'login': {
         this.icon = 'fa-solid fa-arrow-right-to-bracket';
-        this.color = '1, 130, 57';
+        this.color = '84, 200, 119';
         this.text = `${this.$props.value} connected`;
         break;
-      case 'logout':
+      }
+      case 'logout': {
         this.icon = 'fa-solid fa-arrow-right-from-bracket';
         this.color = '253, 34, 84';
         this.text = `${this.$props.value} disconnected`;
         break;
-      case 'role-set':
+      }
+      case 'role-set': {
         this.icon = 'fa-solid fa-user-gear';
         this.color = '85, 31, 255';
         // @ts-ignore
         const values = this.$props.value.split(',');
         this.text = `${values[0]}'s role: ${values[1]}`;
         break;
-      case 'start':
+      }
+
+      case 'start': {
         this.icon = 'fa-solid fa-rocket';
-        this.color = '52, 103, 235';
-        this.text = `Server started on ${this.$props.value}`;
+        this.color = '219, 59, 104';
+        const date = new Date(Number(this.$props.value));
+        this.text = `Server started at ${date.toLocaleTimeString()}`;
         break;
+      }
+
+      case 'stop': {
+        this.icon = 'fa-solid fa-power-off';
+        this.color = '253, 34, 84';
+        const date = new Date(Number(this.$props.value));
+        this.text = `Server stopped at ${date.toLocaleTimeString()}`;
+        break;
+      }
+
+      case 'kill': {
+        this.icon = 'fa-solid fa-skull';
+        this.color = '219, 59, 104';
+        const date = new Date(Number(this.$props.value));
+        this.text = `Server killed at ${date.toLocaleTimeString()}`;
+        break;
+      }
+      case 'restart': {
+        this.icon = 'fa-solid fa-arrow-rotate-left';
+        this.color = '59, 161, 219';
+        const date = new Date(Number(this.$props.value));
+        this.text = `Server restarted at ${date.toLocaleTimeString()}`;
+        break;
+      }
+      case 'update': {
+        this.icon = 'fa-solid fa-wrench';
+        this.color = '227, 77, 77';
+        const date = new Date(Number(this.$props.value));
+        this.text = `Server updated at ${date.toLocaleTimeString()}`;
+        break;
+      }
       default:
         break;
     }
@@ -73,5 +109,6 @@ div.event-item > h4 {
   padding: 5px;
   font-weight: normal;
   font-size: 16px;
+  color: var(--color-slightly-light-gray);
 }
 </style>

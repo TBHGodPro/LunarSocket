@@ -2,9 +2,11 @@ import checkDiskSpace from 'check-disk-space';
 import { Router } from 'express';
 import { cpu } from 'node-os-utils';
 import { freemem, totalmem } from 'node:os';
+import { emitToDashboard } from '..';
 import { connectedPlayers } from '../..';
 import { DatabaseManager } from '../../databases/Manager';
-import events from '../../utils/events';
+import getConfig from '../../utils/config';
+import { events } from '../../utils/events';
 import { getLunarLatency, stats as st } from '../../utils/stats';
 import auth from '../middleware/auth';
 
@@ -12,12 +14,30 @@ const statsRouter = Router();
 
 let currentCpuUsage = 0;
 let diskSpace = [0, 0];
-setInterval(async () => {
+async function updateStats() {
   currentCpuUsage = await cpu.usage(5000);
 
   const space = await checkDiskSpace(process.cwd());
   diskSpace = [space.size - space.free, space.size];
-}, 10000);
+}
+setInterval(updateStats, 10000);
+
+function getProcessStatus() {
+  return {
+    ramUsage: {
+      used: Math.round((totalmem() - freemem()) / 1000000),
+      max: Math.round(totalmem() / 1000000),
+    },
+    cpuUsage: {
+      used: currentCpuUsage,
+      max: 100,
+    },
+    diskSpace: {
+      used: Math.round(diskSpace[0] / 1000000000),
+      max: Math.round(diskSpace[1] / 1000000000),
+    },
+  };
+}
 
 statsRouter.get('/', auth, async (request, response) => {
   const averageConnected = Math.round(
@@ -33,28 +53,17 @@ statsRouter.get('/', auth, async (request, response) => {
     averageConnected: isNaN(averageConnected) ? 0 : averageConnected,
     events: [...events].reverse(),
     onlineGraph: st.onlinePlayers,
-    rankRepartition: {
-      Admin: 1,
-      Developer: 2,
-      Helper: 4,
-    },
-    status: {
-      ramUsage: {
-        used: Math.round((totalmem() - freemem()) / 1000000),
-        max: Math.round(totalmem() / 1000000),
-      },
-      cpuUsage: {
-        used: currentCpuUsage,
-        max: 100,
-      },
-      diskSpace: {
-        used: Math.round(diskSpace[0] / 1000000000),
-        max: Math.round(diskSpace[1] / 1000000000),
-      },
-    },
+    rankRepartition:
+      await DatabaseManager.instance.database.getRoleDistribution(),
+    status: getProcessStatus(),
+    wsPath: (await getConfig()).server.websocketPath,
   };
 
   response.status(200).send(stats);
 });
+
+setInterval(() => {
+  emitToDashboard('updateStats', getProcessStatus());
+}, 15_000);
 
 export default statsRouter;

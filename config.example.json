@@ -14,20 +14,15 @@
   },
   "whitelist": {
     "enabled": true,
-    "list": [
-      "827f8c48-cdb2-4105-af39-df5a64f93490",
-      "7642d15d-2aec-4be8-8cbe-99a53c434248"
-    ]
+    "list": []
   },
-  "operators": ["827f8c48-cdb2-4105-af39-df5a64f93490"],
+  "operators": [],
   "welcomeMessage": "LunarSocket made by SolarTweaks with love <3",
   "database": {
     "type": "instanceStorage",
     "config": {
       "mongo": "mongodb://<password>@localhost:27017",
-      "filePath": "/path/to/file.json",
-      "redis": "redis://alice:foobared@awesome.redis.server:6380",
-      "redisDatabase": 0
+      "filePath": "/path/to/file.json"
     }
   },
   "roles": {

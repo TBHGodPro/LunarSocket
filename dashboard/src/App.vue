@@ -17,6 +17,8 @@ import Header from './components/Header.vue';
 import Content from './components/Content/Content.vue';
 import { isKeyValid, fetchStats, fetchPlayers } from './api';
 import store from './store';
+import { HOST } from './constants';
+import { updateGraphs } from './components/Content/Main.vue';
 
 export let checkKeyAndProceed: (key: string) => Promise<void>;
 
@@ -36,6 +38,101 @@ export default defineComponent({
         localStorage.setItem('apiKey', key);
         store.commit('setApiKey', key);
         await Promise.all([fetchStats(), fetchPlayers()]);
+        const connect = () => {
+          const ws = new WebSocket(
+            `${(HOST || window.location.origin).replace('http', 'ws')}${
+              store.state.stats.wsPath.startsWith('/')
+                ? store.state.stats.wsPath
+                : `/${store.state.stats.wsPath}`
+            }?dashboard=true&apiKey=${store.state.apiKey}`
+          );
+          ws.onerror = (err) => console.error('[WebSocket]', err);
+          ws.onclose = () => {
+            console.log('[WebSocket]', 'Disconnected');
+            connect();
+          };
+          ws.onopen = () => console.log('[WebSocket]', 'Connected');
+          // skipcq: JS-0045 its fine stop crying
+          ws.onmessage = (event) => {
+            let msg: {
+              type: string;
+              data: any;
+            } = {
+              type: '',
+              data: null,
+            };
+            try {
+              msg = JSON.parse(event.data);
+            } catch (err) {
+              return console.error('[WebSocket]', 'Invalid Message', err);
+            }
+            const { type, data } = msg;
+            switch (type) {
+              case 'updateStats':
+                store.state.stats.status = data;
+                break;
+              case 'updateGraphs':
+                if (data.onlineGraph) {
+                  if (data.onlineGraph.action === 'add') {
+                    store.state.stats.onlineGraph[data.onlineGraph.key] =
+                      data.onlineGraph.value;
+                  } else if (data.onlineGraph.action === 'remove') {
+                    delete store.state.stats.onlineGraph[data.onlineGraph.key];
+                  }
+                }
+                updateGraphs();
+                break;
+              case 'playerAdd': {
+                let index = store.state.players.findIndex(
+                  (player) => player.uuid === data.uuid
+                );
+                if (index < 0) {
+                  index = store.state.players.length;
+                  store.state.stats.onlinePlayers += 1;
+                }
+                store.state.players[index] = data;
+                break;
+              }
+              case 'playerRemove':
+                if (
+                  store.state.players.find((player) => player.uuid === data)
+                ) {
+                  store.state.stats.onlinePlayers -= 1;
+                  store.state.players.splice(
+                    store.state.players.findIndex(
+                      (player) => player.uuid === data
+                    ),
+                    1
+                  );
+                }
+                break;
+              case 'roleUpdate': {
+                const index = store.state.players.findIndex(
+                  (player) => player.uuid === data.player
+                );
+                if (index >= 0) store.state.players[index].role = data.role;
+                break;
+              }
+              case 'updatePlayerServer': {
+                const index = store.state.players.findIndex(
+                  (player) => player.uuid === data.player
+                );
+                if (index >= 0) store.state.players[index].server = data.server;
+                break;
+              }
+              case 'event':
+                if (store.state.stats.events.length >= 75)
+                  store.state.stats.events.pop();
+                store.state.stats.events.splice(0, 0, data);
+                break;
+              default:
+                console.error(`Recieved an Unknown Event: ${type}`, data);
+                break;
+            }
+          };
+          store.commit('setWebSocket', ws);
+        };
+        connect();
       } else {
         alert('Your key is invalid');
         localStorage.removeItem('apiKey');
@@ -56,16 +153,34 @@ export default defineComponent({
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 * {
-  --color-orange: #ff6a00;
-  --color-blue: #551fff;
-  --color-light-blue: #00b7fe;
-  --color-red: #fd2254;
-  --color-black: #15192c;
-  --color-dark-gray: #92959e;
-  --color-gray: #d0d2da;
-  --color-light-gray: #f5f5f7;
-  --color-background: #f8f9fc;
+  --background: #121417;
+  --color-text: #f9f9f9;
+  --color-border: #1d1f25;
+  --color-box: #181b1f;
+  --color-light-gray: #d4d6de;
+  --color-slightly-light-gray: #b8babd;
+  --color-gray: #8a8c8f;
+  --color-gray-outline: #8a8c8f25;
+  --color-gray-hover: #8a8c8f40;
+  --color-purple: #5900fe;
+  --color-purple-outline: #5900fe25;
+  --color-purple-hover: #5900fe40;
+  --color-blue: #00b6fe;
+  --color-blue-outline: #00b7fe25;
+  --color-blue-hover: #00b7fe40;
+  --color-green: #54c877;
+  --color-green-outline: #54c87725;
+  --color-green-hover: #54c87740;
+  --color-gold: #ffda75;
+  --color-gold-outline: #ffda7425;
+  --color-gold-hover: #ffda7440;
+  --color-red: #ff4a4a;
+  --color-red-outline: #ff4a4a25;
+  --color-red-hover: #ff4a4a40;
+  --shadow: rgb(0 0 0 / 15%);
 
   margin: 0;
   padding: 0;
@@ -77,7 +192,11 @@ export default defineComponent({
 }
 
 body {
-  background-color: var(--color-background);
+  background-color: var(--background);
+}
+
+option {
+  background-color: var(--background);
 }
 
 div#content-container {

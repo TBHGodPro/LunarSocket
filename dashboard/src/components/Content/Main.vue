@@ -2,34 +2,38 @@
   <div id="container" :style="`height: ${containerHeight}px`">
     <div id="numbers" class="card">
       <Number
-        icon="fa-solid fa-globe"
+        icon="fa-solid fa-earth-americas"
         name="Online"
         :value="String($store.state.stats.onlinePlayers)"
-        color="255, 106, 0"
+        color="84, 200, 119"
       />
       <Number
         icon="fa-solid fa-fingerprint"
         name="Unique"
         :value="String($store.state.stats.uniquePlayers)"
-        color="85, 31, 255"
+        color="219, 168, 59"
       />
       <Number
         icon="fa-solid fa-stopwatch"
         name="Latency"
         :value="`${$store.state.stats.lunarLatency}ms`"
-        color="0, 183, 254"
+        color="59, 161, 219"
       />
       <Number
         icon="fa-solid fa-gauge-simple"
         name="Average"
         :value="String($store.state.stats.averageConnected)"
-        color="253, 34, 84"
+        color="219, 59, 104"
       />
     </div>
     <div id="events" class="card">
       <div class="card-header">
         <h2>Events</h2>
-        <i class="fa-solid fa-square-up-right" @click="showLogsPage()"></i>
+        <i
+          class="fa-solid fa-square-up-right"
+          @click="showLogsPage()"
+          style="color: var(--color-gray)"
+        ></i>
       </div>
       <div id="events-content">
         <Event
@@ -43,27 +47,27 @@
     </div>
     <div id="online" class="card">
       <div class="card-header">
-        <h2>Online players</h2>
+        <h2>Online Graph</h2>
       </div>
       <canvas class="graph" ref="onlineGraph"></canvas>
     </div>
     <div id="rank" class="card">
       <div class="card-header">
-        <h2>Rank repartition</h2>
+        <h2>Rank Repartition</h2>
       </div>
       <p>The default role is hidden</p>
       <canvas class="graph" ref="rankGraph"></canvas>
     </div>
     <div id="status" class="card">
       <div class="card-header">
-        <h2>Server status</h2>
+        <h2>Status</h2>
       </div>
       <Number
         id="uptime"
         icon="fa-solid fa-clock"
         name="Up for"
-        :value="secondsToHms($store.state.stats.uptime)"
-        color="0, 183, 254"
+        :value="uptime"
+        color="59, 161, 219"
         :disablefixedwidth="true"
       />
       <Progress
@@ -72,14 +76,14 @@
         :displayvalue="`${$store.state.stats.status.ramUsage.used} / ${$store.state.stats.status.ramUsage.max} MB`"
         :value="$store.state.stats.status.ramUsage.used"
         :max="$store.state.stats.status.ramUsage.max"
-        color="85, 31, 255"
+        color="145, 96, 235"
       />
       <Progress
         class="progress"
         text="CPU Usage"
         :value="$store.state.stats.status.cpuUsage.used"
         :max="$store.state.stats.status.cpuUsage.max"
-        color="253, 34, 84"
+        color="219, 59, 104"
       />
       <Progress
         :displayvalue="`${$store.state.stats.status.diskSpace.used} / ${$store.state.stats.status.diskSpace.max} GB`"
@@ -87,7 +91,7 @@
         text="Disk Space"
         :value="$store.state.stats.status.diskSpace.used"
         :max="$store.state.stats.status.diskSpace.max"
-        color="255, 106, 0"
+        color="84, 200, 119"
       />
     </div>
     <div id="actions" class="card">
@@ -97,21 +101,25 @@
       <button
         @click="action('update')"
         class="action"
-        style="color: rgb(1, 130, 57); background-color: rgba(1, 130, 57, 0.1)"
+        style="
+          color: rgb(84, 200, 119);
+          background-color: rgba(84, 200, 119, 0.2);
+        "
       >
-        <i class="fa-solid fa-wrench" style="color: rgb(1, 130, 57)"></i>Update
+        <i class="fa-solid fa-wrench" style="color: rgb(84, 200, 119)"></i
+        >Update
       </button>
       <button
         @click="action('restart')"
         class="action"
         style="
-          color: rgb(0, 183, 254);
-          background-color: rgba(0, 183, 254, 0.1);
+          color: rgb(59, 161, 219);
+          background-color: rgba(59, 161, 219, 0.2);
         "
       >
         <i
           class="fa-solid fa-arrow-rotate-left"
-          style="color: rgb(0, 183, 254)"
+          style="color: rgb(59, 161, 219)"
         ></i
         >Restart
       </button>
@@ -119,22 +127,22 @@
         @click="action('stop')"
         class="action"
         style="
-          color: rgb(255, 106, 0);
-          background-color: rgba(255, 106, 0, 0.1);
+          color: rgb(219, 168, 59);
+          background-color: rgba(219, 168, 59, 0.2);
         "
       >
-        <i class="fa-solid fa-power-off" style="color: rgb(255, 106, 0)"></i
+        <i class="fa-solid fa-power-off" style="color: rgb(219, 168, 59)"></i
         >Stop
       </button>
       <button
         @click="action('kill')"
         class="action"
         style="
-          color: rgb(253, 34, 84);
-          background-color: rgba(253, 34, 84, 0.1);
+          color: rgb(219, 59, 104);
+          background-color: rgba(219, 59, 104, 0.2);
         "
       >
-        <i class="fa-solid fa-skull" style="color: rgb(253, 34, 84)"></i>Kill
+        <i class="fa-solid fa-skull" style="color: rgb(219, 59, 104)"></i>Kill
       </button>
     </div>
   </div>
@@ -158,6 +166,7 @@ export default defineComponent({
 
   data: () => ({
     containerHeight: 500,
+    uptime: 'Loading...',
   }),
 
   methods: {
@@ -194,7 +203,8 @@ export default defineComponent({
             {
               // @ts-ignore
               data: Object.values(this.$store.state.stats.onlineGraph),
-              borderColor: 'rgb(75, 192, 192)',
+              borderColor: '#54c877',
+              backgroundColor: '#54c87725',
               tension: 0.2,
             },
           ],
@@ -247,6 +257,16 @@ export default defineComponent({
       this.renderOnlineGraph();
       this.renderRankGraph();
     },
+    updateUptime(uptime: any) {
+      console.log(`Uptime changed to ${uptime}`);
+      this.uptime = this.secondsToHms(uptime);
+      setInterval(
+        () =>
+          (this.uptime = this.secondsToHms(
+            Math.floor(Date.now() / 1000) - uptime
+          ))
+      );
+    },
   },
 
   created() {
@@ -258,6 +278,19 @@ export default defineComponent({
     updateGraphs = this.updateGraphs;
     this.renderOnlineGraph();
     this.renderRankGraph();
+    // @ts-ignore
+    if (this.$store.state.stats.uptime == 0) {
+      // @ts-ignore
+      const unwatch = this.$store.watch(
+        (state: any) => state.stats.uptime,
+        (uptime: any) => {
+          unwatch();
+          this.updateUptime(uptime);
+        }
+      );
+    }
+    // @ts-ignore
+    else this.updateUptime(this.$store.state.stats.uptime);
   },
 
   unmounted() {
@@ -269,6 +302,8 @@ export default defineComponent({
 
 <style scoped>
 div#container {
+  width: 1400px;
+  height: 50px;
   margin: 50px 0 0 60px;
   display: grid;
   grid-template-columns: repeat(6, 180px);
@@ -276,17 +311,29 @@ div#container {
   grid-column-gap: 60px;
   grid-row-gap: 35px;
   overflow-y: scroll;
-  padding-bottom: 25px;
 }
 
 div#container::-webkit-scrollbar {
-  display: none;
+  width: 10px;
+  border-radius: 5rem;
+  background: transparent;
+}
+
+div#container::-webkit-scrollbar-thumb {
+  border-radius: 5rem;
+  background: var(--color-gray-outline);
+}
+
+div#container::-webkit-scrollbar-thumb:hover {
+  border-radius: 5rem;
+  background: var(--color-gray-hover);
 }
 
 div.card {
-  background-color: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0px 18px 32px rgba(208, 210, 218, 0.15);
+  background-color: var(--color-box);
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 0 5px 0 var(--shadow);
 }
 
 div#numbers {
@@ -311,12 +358,20 @@ div.card-header {
 }
 
 div.card-header > h2 {
-  font-size: 24px;
+  color: var(--color-gray);
+  font-size: 1rem;
+  font-weight: 600;
   line-height: 28px;
 }
 
 div.card-header > i {
+  color: var(--color-gray-outline);
   cursor: pointer;
+  transition: 0.25s ease-in-out;
+}
+
+div.card-header > i:hover {
+  color: var(--color-gray);
 }
 
 div#events-content {
@@ -329,6 +384,7 @@ div#events-content {
 }
 
 div#events-content > p {
+  color: var(--color-gray);
   margin-top: 15px;
   font-size: 14px;
   line-height: 16px;
@@ -352,12 +408,13 @@ div#rank {
   grid-column: span 2;
   grid-row: span 3;
   padding: 20px 0;
+  height: 500px;
 }
 
 div#rank > p {
   font-size: 14px;
   line-height: 18px;
-  color: var(--color-dark-gray);
+  color: var(--color-gray);
   margin: -15px 0 0 25px;
 }
 
@@ -369,6 +426,7 @@ div#status {
   grid-column: span 2;
   grid-row: span 3;
   padding: 20px 0;
+  height: 500px;
 }
 
 div#uptime {
@@ -380,25 +438,31 @@ div.progress {
 }
 
 div#actions {
+  display: flex;
+  flex-direction: column;
   grid-column: span 2;
   grid-row: span 2;
-  padding: 20px 0;
+  padding: 20px 0px;
   text-align: center;
+  height: 315px;
 }
 
 button.action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 50px;
   width: 85%;
-  border-radius: 15px;
+  border-radius: 0.35rem;
   outline: none;
   border: none;
-  margin: 10px;
+  margin: 5px 30px;
   cursor: pointer;
-  transition: transform 0.2s ease-in-out;
+  transition: filter 0.2s ease-in-out;
 }
 
 button.action:hover {
-  transform: scale(1.05);
+  filter: brightness(1.5);
 }
 
 button.action > i {

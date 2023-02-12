@@ -1,4 +1,4 @@
-import events from '../utils/events';
+import { registerEvent } from '../utils/events';
 import findPlayer from '../utils/findPlayer';
 import Command from './Command';
 
@@ -39,10 +39,10 @@ command.setHandler(async (player, command, args) => {
       player.sendConsoleMessage(
         `§a${target} has been given the role ${foundTarget.role.name}`
       );
-      events.push({
-        type: 'role-set',
-        value: `${foundTarget.username},${foundTarget.role.name}`,
-      });
+      registerEvent(
+        'role-set',
+        `${foundTarget.username},${foundTarget.role.name}`
+      );
       break;
 
     default:

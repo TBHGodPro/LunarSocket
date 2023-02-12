@@ -4,8 +4,10 @@
 
 <script>
 import { defineComponent } from 'vue';
+
 import Main from './Main.vue';
 import Players from './Players.vue';
+import Logs from './Logs.vue';
 
 export default defineComponent({
   name: 'Content',
@@ -13,6 +15,7 @@ export default defineComponent({
   components: {
     Main,
     Players,
+    Logs,
   },
 });
 </script>

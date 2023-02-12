@@ -7,13 +7,13 @@ export default createStore({
     activeTab: '',
     apiKey: '',
     stats: {
-      uptime: 'Loading',
-      onlinePlayers: 'Loading',
+      uptime: 0,
+      onlinePlayers: 'Loading' as unknown as number,
       uniquePlayers: 'Loading',
       lunarLatency: 'Loading',
       averageConnected: 'Loading',
-      events: [],
-      onlineGraph: {},
+      events: [] as { type: string; value: any }[],
+      onlineGraph: {} as { [key: string]: number },
       rankRepartition: {},
       status: {
         ramUsage: {
@@ -29,8 +29,10 @@ export default createStore({
           max: 1000,
         },
       },
+      wsPath: '/',
     },
     players: [] as Player[],
+    websocket: null as unknown as WebSocket,
   },
   mutations: {
     setActiveTab(state, tab) {
@@ -42,15 +44,21 @@ export default createStore({
     setStats(state, stats) {
       state.stats = stats;
       updateGraphs();
+      state.stats.uptime = Math.floor(Date.now() / 1000) - state.stats.uptime;
     },
     setPlayers(state, players: Player[]) {
       state.players = players;
+    },
+    setWebSocket(state, websocket: WebSocket) {
+      state.websocket = websocket;
     },
   },
 });
 
 export interface Player {
   uuid: string;
-  name: string;
+  username: string;
   role: string;
+  server: string;
+  version: string;
 }

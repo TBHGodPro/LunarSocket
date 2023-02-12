@@ -10,7 +10,6 @@ export default function auth(
 ) {
   const header = request.headers['authorization'];
 
-  if (!header) return response.sendStatus(401);
-  else if (header === authorization) next();
-  else return response.sendStatus(401);
+  if (!header || header !== authorization) return response.sendStatus(401);
+  else return next();
 }

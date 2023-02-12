@@ -9,7 +9,7 @@ const command = new Command(
 
 command.help = `usage: privatebroadcast <player> <message>`;
 
-command.setHandler((player, command, args) => {
+command.setHandler((player, c, args) => {
   let title = '';
   let message = args.slice(1).join(' ');
   const target = args[0];
@@ -20,9 +20,10 @@ command.setHandler((player, command, args) => {
     message = split[1];
   }
 
-  for (const player of connectedPlayers) {
-    if (player.username == target) {
-      player.sendNotification(
+  for (const p of connectedPlayers) {
+    if (p.username === target) {
+      // skipcq
+      p.sendNotification(
         title,
         message.replace(/&([0123456789AaBbCcDdEeFfKkLlMmNnOoRr])/g, '§$1')
       );

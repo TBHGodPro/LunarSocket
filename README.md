@@ -22,7 +22,7 @@ $ npm run build # Build the project
 # For the dashboard
 $ cd dashboard # Go to the dashboard folder
 $ npm install # Install dependencies
-$ npm run build
+$ npm run build # Build the dashboard
 ```
 
 # 💻 Installation using Script
@@ -31,9 +31,9 @@ $ npm run build
 $ git clone https://github.com/Solar-Tweaks/LunarSocket # Clone repo
 $ cd LunarSocket # Go to LunarSocket folder
 $ npm install # Install dependencies
-$ npm run init # Execute the init script
+$ npm run init # Execute the init script, which installs all dependencies and builds the project and dashboard
 ```
-or (Linux only)
+or (Linux and MacOS only)
 
 ```bash
 curl https://raw.githubusercontent.com/Solar-Tweaks/LunarSocket/main/install.sh | bash
@@ -58,7 +58,6 @@ There are a few types of databases available:
 - `instanceStorage` - Stores the data in the Lunar Socket instance which means that the data will be deleted when the server is restarted/stopped/updated.
 - `mongo` - Stores the data in a MongoDB database.
 - `fileStorage` - Stores the data in the provided json file.
-- `Redis` - Stores the data in a Redis database; (Requires RedisJson)
 
 # Permission system
 

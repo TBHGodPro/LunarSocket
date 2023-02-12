@@ -9,7 +9,7 @@
     ></i>
     <div class="number-text">
       <h3>{{ $props.name }}</h3>
-      <h4>{{ $props.value }}</h4>
+      <h4 :style="`color: rgb(${$props.color});`">{{ $props.value }}</h4>
     </div>
   </div>
 </template>
@@ -47,14 +47,18 @@ div.number-text {
 
 div.number-text > h3 {
   margin-top: 8px;
-  font-size: 16px;
   line-height: 19px;
-  color: var(--color-dark-gray);
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  font-style: italic;
+  color: var(--color-gray);
 }
 
 div.number-text > h4 {
   font-size: 20px;
+  font-weight: 400;
   line-height: 23px;
-  color: var(--color-black);
 }
 </style>

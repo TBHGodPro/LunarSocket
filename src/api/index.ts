@@ -2,6 +2,7 @@ import { Express } from 'express';
 import { readFileSync } from 'node:fs';
 import * as http from 'node:http';
 import * as https from 'node:https';
+import { WebSocket } from 'ws';
 import { initConfig } from '../utils/config';
 import initAPI from './api';
 
@@ -26,4 +27,28 @@ export default function createServer(): http.Server | https.Server {
   server.listen(config.server.port);
 
   return server;
+}
+
+export const connections: WebSocket[] = [];
+
+export type DashboardEventType =
+  | 'event'
+  | 'playerAdd'
+  | 'playerRemove'
+  | 'roleUpdate'
+  | 'updateStats'
+  | 'updateGraphs'
+  | 'updatePlayerServer';
+
+export interface DashboardEvent {
+  type: DashboardEventType;
+  data: any;
+}
+
+export function emitToDashboard(type: DashboardEventType, data: any) {
+  const msg = {
+    type,
+    data,
+  };
+  connections.forEach((socket) => socket.send(JSON.stringify(msg)));
 }

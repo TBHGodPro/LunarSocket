@@ -17,8 +17,9 @@ import PlayEmotePacket from '../packets/PlayEmotePacket';
 import PlayerInfoPacket from '../packets/PlayerInfoPacket';
 import CallQueue from '../utils/CallQueue';
 import getConfig from '../utils/config';
-import events from '../utils/events';
+import { registerEvent } from '../utils/events';
 import logger from '../utils/logger';
+import { Cosmetic } from '../utils/lunar';
 import { getRole, Role } from '../utils/roles';
 
 export default class Player {
@@ -50,7 +51,11 @@ export default class Player {
   private outgoingPacketHandler: OutgoingPacketHandler;
   private incomingPacketHandler: IncomingPacketHandler;
 
-  public constructor(socket: WebSocket, handshake: Handshake) {
+  public constructor(
+    socket: WebSocket,
+    handshake: Handshake,
+    cosmetics: Cosmetic[]
+  ) {
     this.version = handshake.version;
     this.username = handshake.username;
     this.uuid = handshake.playerId;
@@ -80,14 +85,14 @@ export default class Player {
     this.socket = socket;
     this.outgoingPacketHandler = new OutgoingPacketHandler(this);
     this.incomingPacketHandler = new IncomingPacketHandler(this);
+
     // Yes, we are giving emotes out of nowhere
-    for (let i = 0; i < 250; i++) this.emotes.owned.fake.push(i);
+    for (let id = 0; id < 400; id++) this.emotes.owned.fake.push(id);
 
-    // Yes, we're giving cosmetics out of nowhere again
-    for (let i = 1; i < 3659; i++)
-      this.cosmetics.fake.push({ id: i, equipped: false });
+    for (const cosmetic of cosmetics)
+      this.cosmetics.fake.push({ id: cosmetic.id, equipped: false });
 
-    const handleIncomingMessage = async (data: Buffer) => {
+    const handleIncomingMessage = (data: Buffer) => {
       // Trying to handle packet
       try {
         this.incomingPacketHandler.handle(data);
@@ -100,10 +105,9 @@ export default class Player {
     // Queuing incoming messages in case the client
     // is sending a packet while the fake socket
     // isn't ready yet
-    const incomingMessageQueue = new CallQueue<
-      Buffer,
-      (data: Buffer) => Promise<void>
-    >(handleIncomingMessage);
+    const incomingMessageQueue = new CallQueue<Buffer, (data: Buffer) => void>(
+      handleIncomingMessage
+    );
 
     // Forwarding data
     this.socket.on('message', (data: Buffer) => {
@@ -174,7 +178,7 @@ export default class Player {
       );
       this.commandHandler = new CommandHandler(this);
       logger.log(this.username, 'connected!');
-      events.push({ type: 'login', value: this.username });
+      registerEvent('login', this.username);
 
       this.fakeSocket.once('message', async () => {
         await incomingMessageQueue.emptyQueue();
@@ -334,13 +338,17 @@ export default class Player {
     if (this.disconnected) return;
     this.disconnected = true;
     logger.log(this.username, 'disconnected!');
-    events.push({ type: 'logout', value: this.username });
+    registerEvent('logout', this.username);
     try {
       this.socket.close(1000);
-    } catch (error) {}
+    } catch (error) {
+      this.socket = null;
+    }
     try {
       this.fakeSocket.close(1000);
-    } catch (error) {}
+    } catch (error) {
+      this.fakeSocket = null;
+    }
     this.updateDatabase().then(() => removePlayer(this.uuid));
   }
 

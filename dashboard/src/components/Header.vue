@@ -21,12 +21,13 @@ div#container {
 h1 {
   font-size: 40px;
   line-height: 47px;
+    color: var(--color-light-gray);
 }
 
 h2 {
   font-size: 18px;
   line-height: 21px;
-  color: var(--color-dark-gray);
+  color: var(--color-gray);
   font-weight: normal;
 }
 </style>

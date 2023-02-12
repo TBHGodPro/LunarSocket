@@ -1,18 +1,15 @@
 <template>
   <div id="container">
     <div id="login">
-      <h1>Lunar Socket</h1>
-      <h2>Please enter the API key below</h2>
-      <input v-model="apiKey" type="password" placeholder="API key goes here" />
-      <br />
-      <button
-        @click="go()"
-        style="
-          color: rgb(0, 183, 254);
-          background-color: rgba(0, 183, 254, 0.1);
-        "
-      >
-        <i class="fa-solid fa-rocket" style="color: rgb(0, 183, 254)"></i>
+      <img class="label" src="https://i.imgur.com/NQtjjqv.png" />
+      <input
+        v-model="apiKey"
+        type="password"
+        placeholder="Please enter the API key"
+      />
+      <hr />
+      <button @click="go()">
+        <i class="fa-solid fa-rocket" style="color: var(--color-blue)"></i>
         Go
       </button>
     </div>
@@ -68,51 +65,83 @@ div#login {
   position: absolute;
   top: 50%;
   left: 50%;
+  padding: 25px;
   transform: translate(-50%, -50%);
-  width: 25%;
-  background-color: white;
+  width: 400px;
+  background-color: var(--color-box);
   border-radius: 25px;
-  box-shadow: 0px 18px 32px rgba(208, 210, 218, 0.15);
+  box-shadow: 0 0 5px 0 var(--shadow);
   animation: fadeIn 0.5s;
   text-align: center;
 }
 
 h1 {
+  color: var(--color-blue);
   padding: 25px;
   font-size: 36px;
 }
 
 h2 {
-  color: var(--color-dark-gray);
+  color: var(--color-gray);
   font-weight: normal;
 }
 
+img.label {
+  image-rendering: crisp-edges;
+  margin: 25px 0;
+  width: 250px;
+  filter: brightness(0.9);
+}
+
 input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   outline: none;
   border: none;
-  background-color: rgba(0, 183, 254, 0.1);
-  font-size: 14px;
-  height: 50px;
-  width: 85%;
-  border-radius: 15px;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.65rem;
+  color: var(--color-blue);
+  background-color: var(--color-blue-outline);
+  height: 45px;
+  width: 100%;
+  border-radius: 0.5rem;
+  margin-top: 25px;
   text-align: center;
-  margin: 25px 0 10px 0;
+}
+
+input::placeholder {
+  color: var(--color-blue);
+}
+
+hr {
+  margin: 15px 0;
+  border: 1px solid var(--color-border);
+  border-radius: 5rem;
 }
 
 button {
-  height: 50px;
-  width: 85%;
-  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 45px;
+  width: 100%;
+  border-radius: 0.5rem;
   outline: none;
   border: none;
-  margin: 10px;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.85rem;
   cursor: pointer;
-  transition: transform 0.2s ease-in-out;
+  color: var(--color-blue);
+  background-color: var(--color-blue-outline);
+  transition: background-color 0.25s ease-in-out;
   margin-bottom: 25px;
 }
 
 button:hover {
-  transform: scale(1.05);
+  background-color: var(--color-blue-hover);
 }
 
 button > i {

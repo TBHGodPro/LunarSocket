@@ -1,4 +1,4 @@
-export default class CallQueue<T, C extends (...args: T[]) => Promise<void>> {
+export default class CallQueue<T, C extends (...args: T[]) => void> {
   public queue: T[][];
   private call: C;
 

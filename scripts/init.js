@@ -89,8 +89,8 @@ const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
       },
       databaseType: {
         description:
-          'What database do you want to use? (instanceStorage, fileStorage, redis, mongo)',
-        pattern: /instanceStorage|fileStorage|redis|mongo/,
+          'What database do you want to use? (instanceStorage, fileStorage, mongo)',
+        pattern: /instanceStorage|fileStorage|mongo/,
         default: 'instanceStorage',
         type: 'string',
       },
@@ -110,23 +110,6 @@ const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
           return prompt.history('databaseType').value === 'fileStorage';
         },
       },
-      redis: {
-        description: 'Redis uri',
-        required: true,
-        type: 'string',
-        ask() {
-          return prompt.history('databaseType').value === 'redis';
-        },
-      },
-      redisDb: {
-        description: 'Redis database number',
-        required: true,
-        default: 0,
-        type: 'integer',
-        ask() {
-          return prompt.history('databaseType').value === 'redis';
-        },
-      },
     },
   });
 
@@ -136,14 +119,14 @@ const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
     key: results.keyPath,
     cert: results.certPath,
   };
+  config.api.enabled = results.api;
+  config.api.authorization = results.apiAuth;
   config.whitelist.enabled = results.whitelist;
   config.welcomeMessage = results.welcomeMessage;
   config.database.type = results.databaseType;
   config.database.config = {
     mongo: results.mongo,
     filePath: results.filePath,
-    redis: results.redis,
-    redisDatabase: results.redisDb,
   };
 
   await writeFile(

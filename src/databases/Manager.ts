@@ -3,14 +3,12 @@ import logger from '../utils/logger';
 import FileStorage from './FileStorage';
 import InstanceStorage from './InstanceStorage';
 import Mongo from './Mongo';
-import Redis from './Redis';
 
 class DatabaseManager {
   public static constructors = {
     instanceStorage: InstanceStorage,
     mongo: Mongo,
     fileStorage: FileStorage,
-    redis: Redis,
   } as const;
   public static instance = new DatabaseManager();
 
