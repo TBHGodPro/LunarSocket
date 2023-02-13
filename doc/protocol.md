@@ -40,7 +40,7 @@
 | 70        | [Unused](#unused---70)                                                                        | Server   |
 | 71        | [Unknown](#unknown---71)                                                                      | Server   |
 | 72        | [Unused](#unused---72)                                                                        | Unknown  |
-| 73        | [Unknown](#unknown---73)                                                                      | Server   |
+| 73        | [UpdatePlusColors](#updatepluscolors---73)                                                                      | Server   |
 | 1056      | [ClientBan](#clientban---1056)                                                                | Client   |
 
 # Clientbound packets
@@ -741,14 +741,16 @@ Apparently the first field is a server ip (not sure).
 
 See [implementation](../src/packets/PacketId71.ts)
 
-## Unknown - `73`
+## UpdatePlusColors - `73`
 
-??
+Sends the client the colors it is able to 
+use.
+Client Renderered month is based off Array position
 
 ```js
 {
-  unknownList: 'Array<int>';
+  colors: 'Array<int>';
 }
 ```
 
-See [implementation](../src/packets/PacketId73.ts)
+See [implementation](../src/packets/UpdatePlusColors.ts)
