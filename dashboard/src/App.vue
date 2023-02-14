@@ -80,6 +80,8 @@ export default defineComponent({
                     delete store.state.stats.onlineGraph[data.onlineGraph.key];
                   }
                 }
+                if (data.rankRepartition)
+                  store.state.stats.rankRepartition = data.rankRepartition;
                 updateGraphs();
                 break;
               case 'playerAdd': {

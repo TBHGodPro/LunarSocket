@@ -21,13 +21,30 @@
       >
         <i class="fa-solid fa-user-gear" style="color: rgb(59, 161, 219)"></i>
       </div>
+      <div
+        class="player-action"
+        style="background-color: rgba(249, 59, 104, 0.2)"
+        @click="kick()"
+      >
+        <i
+          class="fa-solid fa-arrow-right-from-bracket"
+          style="color: rgb(255, 59, 104)"
+        ></i>
+      </div>
+      <div
+        class="player-action"
+        style="background-color: rgba(253, 34, 84, 0.2)"
+        @click="crash()"
+      >
+        <i class="fa-solid fa-skull" style="color: rgb(253, 34, 84)"></i>
+      </div>
     </div>
   </div>
 </template>
 
 <script alng="ts">
 import { defineComponent } from '@vue/runtime-core';
-import { sendMessage, setRole } from '../../api';
+import { crash, kick, sendMessage, setRole } from '../../api';
 
 export default defineComponent({
   name: 'Player',
@@ -49,6 +66,18 @@ export default defineComponent({
         `What role do you want to set for ${this.$props.name}?`
       );
       await setRole(this.$props.uuid, role);
+    },
+    async kick() {
+      const confirmed = confirm(
+        `Are you sure you want to kick ${this.$props.name} from the WebSocket?\n\n(They will reconnect pretty soon)`
+      );
+      if (confirmed) await kick(this.$props.uuid);
+    },
+    async crash() {
+      const confirmed = confirm(
+        `Are you sure you want to crash ${this.$props.name}?`
+      );
+      if (confirmed) await crash(this.$props.uuid);
     },
   },
 });
@@ -78,7 +107,7 @@ div.actions > * {
 div.infos > h5 {
   font-weight: 600;
   width: 250px;
-    color: var(--color-light-gray);
+  color: var(--color-light-gray);
 }
 
 div.infos > p {

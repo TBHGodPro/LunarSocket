@@ -76,3 +76,33 @@ export async function setRole(player: string, role: string): Promise<void> {
     }
   );
 }
+
+export async function kick(player: string): Promise<void> {
+  await $fetch(
+    ENDPOINTS.KICK,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        uuid: player,
+      }),
+    },
+    {
+      'Content-Type': 'application/json',
+    }
+  );
+}
+
+export async function crash(player: string): Promise<void> {
+  await $fetch(
+    ENDPOINTS.CRASH,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        uuid: player,
+      }),
+    },
+    {
+      'Content-Type': 'application/json',
+    }
+  );
+}

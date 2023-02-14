@@ -53,8 +53,7 @@ statsRouter.get('/', auth, async (request, response) => {
     averageConnected: isNaN(averageConnected) ? 0 : averageConnected,
     events: [...events].reverse(),
     onlineGraph: st.onlinePlayers,
-    rankRepartition:
-      await DatabaseManager.instance.database.getRoleDistribution(),
+    rankRepartition: await DatabaseManager.instance.getRoleDistribution(),
     status: getProcessStatus(),
     wsPath: (await getConfig()).server.websocketPath,
   };

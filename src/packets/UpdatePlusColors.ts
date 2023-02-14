@@ -2,7 +2,7 @@ import BufWrapper from '@minecraft-js/bufwrapper';
 
 import Packet from './Packet';
 
-export default class UpdatePlusColors extends Packet<UpdatePlusColors> {
+export default class UpdatePlusColorsPacket extends Packet<UpdatePlusColors> {
   public static id = 73;
 
   public constructor(buf?: BufWrapper) {
@@ -13,7 +13,7 @@ export default class UpdatePlusColors extends Packet<UpdatePlusColors> {
     this.data = data;
 
     this.buf = new BufWrapper(null, { oneConcat: true });
-    this.buf.writeVarInt(UpdatePlusColors.id); // Packet ID
+    this.buf.writeVarInt(UpdatePlusColorsPacket.id); // Packet ID
 
     this.buf.writeVarInt(data.colors.length);
     for (const i of data.colors) this.buf.writeInt(i);

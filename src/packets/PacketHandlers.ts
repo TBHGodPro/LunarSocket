@@ -53,6 +53,7 @@ const OutgoingPackets = {
   joinServer: JoinServerPacket,
   receiveFriendRequest: ReceiveFriendRequestPacket,
   chatMessage: ChatMessagePacket,
+  updatePlusColors: UpdatePlusColors,
 };
 
 // Outgoing is when a packet is sent by the server to the client
@@ -114,7 +115,6 @@ const IncomingPackets = {
   toggleFriendRequests: ToggleFriendRequestsPacket,
   updateVisiblePlayers: UpdateVisiblePlayersPacket,
   id71: PacketId71,
-  updatePlusColors: UpdatePlusColors,
 };
 
 // Incoming is when a packet is sent by the client to the server
