@@ -33,10 +33,10 @@
       </div>
       <div
         class="player-action"
-        style="background-color: rgba(253, 34, 84, 0.2)"
+        style="background-color: rgba(255, 218, 117, 0.2)"
         @click="crash()"
       >
-        <i class="fa-solid fa-skull" style="color: rgb(253, 34, 84)"></i>
+        <i class="fa-solid fa-skull" style="color: rgb(255, 218, 117)"></i>
       </div>
     </div>
   </div>
@@ -85,6 +85,11 @@ export default defineComponent({
 
 <style scoped>
 div.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
   height: 60px;
   border-radius: 15px;
   margin: 5px 20px;
@@ -106,7 +111,8 @@ div.actions > * {
 
 div.infos > h5 {
   font-weight: 600;
-  width: 250px;
+  text-align: left;
+  width: 200px;
   color: var(--color-light-gray);
 }
 
@@ -140,10 +146,9 @@ div.player-action > i {
 }
 
 img.avatar {
+  image-rendering: pixelated;
   width: 45px;
   height: 45px;
-  border-radius: 10px;
-  margin-top: 8px;
-  margin-left: 5px;
+  border-radius: 5px;
 }
 </style>
