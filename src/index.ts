@@ -1,5 +1,6 @@
 import { Server as WebSocketServer } from 'ws';
 import createServer, { connections, emitToDashboard } from './api';
+import { getStats } from './api/routes/stats';
 import Packet from './packets/Packet';
 import Player, { Handshake } from './player/Player';
 import getConfig, { initConfig } from './utils/config';
@@ -37,7 +38,21 @@ server.on('connection', async (socket, request) => {
     const query = new URLSearchParams(request.url.split('?')[1]);
     if (query.get('apiKey') === (await getConfig()).api.authorization) {
       socket.on('close', () => connections.splice(connections.indexOf(socket)));
-      return connections.push(socket);
+      connections.push(socket);
+      return emitToDashboard(
+        'info',
+        {
+          stats: await getStats(),
+          players: connectedPlayers.map((p) => ({
+            uuid: p.uuid,
+            username: p.username,
+            role: p.role.name,
+            server: p.server,
+            version: p.version,
+          })),
+        },
+        socket
+      );
     } else if ((await getConfig()).api.enabled) return socket.close(4004);
     else return socket.close(4001);
   }

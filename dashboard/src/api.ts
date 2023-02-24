@@ -15,6 +15,8 @@ export async function $fetch(
   });
 }
 
+export let wsPath = '';
+
 export async function isKeyValid(key: string): Promise<boolean> {
   const response = await $fetch(
     ENDPOINTS.KEY,
@@ -23,6 +25,8 @@ export async function isKeyValid(key: string): Promise<boolean> {
       Authorization: key,
     }
   );
+  if (response.status === 200)
+    await response.json().then((data) => (wsPath = data.wsPath));
   return response.status === 200;
 }
 
@@ -30,16 +34,6 @@ export async function sendAction(action: string): Promise<void> {
   await $fetch(`${ENDPOINTS.ACTION}/${action}`, {
     method: 'POST',
   });
-}
-
-export async function fetchStats(): Promise<void> {
-  const response = await $fetch(ENDPOINTS.STATS);
-  store.commit('setStats', await response.json());
-}
-
-export async function fetchPlayers(): Promise<void> {
-  const response = await $fetch(ENDPOINTS.PLAYERS);
-  store.commit('setPlayers', await response.json());
 }
 
 export async function sendMessage(

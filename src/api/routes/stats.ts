@@ -5,7 +5,6 @@ import { freemem, totalmem } from 'node:os';
 import { emitToDashboard } from '..';
 import { connectedPlayers } from '../..';
 import { DatabaseManager } from '../../databases/Manager';
-import getConfig from '../../utils/config';
 import { events } from '../../utils/events';
 import { getLunarLatency, stats as st } from '../../utils/stats';
 import auth from '../middleware/auth';
@@ -39,13 +38,13 @@ function getProcessStatus() {
   };
 }
 
-statsRouter.get('/', auth, async (request, response) => {
+export async function getStats() {
   const averageConnected = Math.round(
     Object.values(st.onlinePlayers).reduce((p, c) => p + c, 0) /
       Object.values(st.onlinePlayers).length
   );
 
-  const stats = {
+  return {
     uptime: Math.round(process.uptime()),
     onlinePlayers: connectedPlayers.length,
     uniquePlayers: await DatabaseManager.instance.database.getPlayerCount(),
@@ -55,8 +54,11 @@ statsRouter.get('/', auth, async (request, response) => {
     onlineGraph: st.onlinePlayers,
     rankRepartition: await DatabaseManager.instance.getRoleDistribution(),
     status: getProcessStatus(),
-    wsPath: (await getConfig()).server.websocketPath,
   };
+}
+
+statsRouter.get('/', auth, async (request, response) => {
+  const stats = await getStats();
 
   response.status(200).send(stats);
 });

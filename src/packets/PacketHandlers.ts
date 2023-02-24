@@ -23,7 +23,6 @@ import JoinServerPacket from './JoinServerPacket';
 import KeepAlivePacket from './KeepAlivePacket';
 import NotificationPacket from './NotificationPacket';
 import PacketId71 from './PacketId71';
-import UpdatePlusColors from './UpdatePlusColors';
 import PendingRequestsPacket from './PendingRequestsPacket';
 import PlayEmotePacket from './PlayEmotePacket';
 import PlayerInfoPacket from './PlayerInfoPacket';
@@ -33,6 +32,7 @@ import RemoveFriendPacket from './RemoveFriendPacket';
 import TaskListPacket from './TaskListPacket';
 import TaskListRequestPacket from './TaskListRequestPacket';
 import ToggleFriendRequestsPacket from './ToggleFriendRequestsPacket';
+import UpdatePlusColors from './UpdatePlusColors';
 import UpdateVisiblePlayersPacket from './UpdateVisiblePlayersPacket';
 
 const OutgoingPackets = {

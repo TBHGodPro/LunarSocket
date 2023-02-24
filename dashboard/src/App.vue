@@ -15,7 +15,7 @@ import Login from './components/Login.vue';
 import Sidebar from './components/Sidebar.vue';
 import Header from './components/Header.vue';
 import Content from './components/Content/Content.vue';
-import { isKeyValid, fetchStats, fetchPlayers } from './api';
+import { isKeyValid, wsPath } from './api';
 import store from './store';
 import { HOST } from './constants';
 import { updateGraphs } from './components/Content/Main.vue';
@@ -37,13 +37,10 @@ export default defineComponent({
         this.loggedIn = true;
         localStorage.setItem('apiKey', key);
         store.commit('setApiKey', key);
-        await Promise.all([fetchStats(), fetchPlayers()]);
         const connect = () => {
           const ws = new WebSocket(
             `${(HOST || window.location.origin).replace('http', 'ws')}${
-              store.state.stats.wsPath.startsWith('/')
-                ? store.state.stats.wsPath
-                : `/${store.state.stats.wsPath}`
+              wsPath.startsWith('/') ? wsPath : `/${wsPath}`
             }?dashboard=true&apiKey=${store.state.apiKey}`
           );
           ws.onerror = (err) => console.error('[WebSocket]', err);
@@ -68,6 +65,10 @@ export default defineComponent({
             }
             const { type, data } = msg;
             switch (type) {
+              case 'info':
+                store.commit('setStats', data.stats);
+                store.commit('setPlayers', data.players);
+                break;
               case 'updateStats':
                 store.state.stats.status = data;
                 break;

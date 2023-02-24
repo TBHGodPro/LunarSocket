@@ -32,6 +32,7 @@ export default function createServer(): http.Server | https.Server {
 export const connections: WebSocket[] = [];
 
 export type DashboardEventType =
+  | 'info'
   | 'event'
   | 'playerAdd'
   | 'playerRemove'
@@ -45,10 +46,16 @@ export interface DashboardEvent {
   data: any;
 }
 
-export function emitToDashboard(type: DashboardEventType, data: any) {
+export function emitToDashboard(
+  type: DashboardEventType,
+  data: any,
+  socket?: WebSocket
+) {
   const msg = {
     type,
     data,
   };
-  connections.forEach((socket) => socket.send(JSON.stringify(msg)));
+  const packet = JSON.stringify(msg);
+  if (socket) socket.send(packet);
+  else connections.forEach((socket) => socket.send(packet));
 }
