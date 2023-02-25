@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "prettier --write src/**/*.ts --config .prettierrc",
-    "build": "rm -rf ./dist && tsc",
+    "build": "tsc",
     "start": "node .",
     "init": "node scripts/init.js",
     "update": "node scripts/init.js --update"
