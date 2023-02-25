@@ -2,9 +2,11 @@
   <div class="container">
     <img class="avatar" :src="`https://cravatar.eu/avatar/${uuid}`" />
     <div class="infos">
-      <h5>{{ name }}</h5>
+      <h4>{{ name }}</h4>
       <p>{{ uuid }}</p>
-      <h6>{{ role }}</h6>
+      <h6>{{ version.substring(1).replace(/_/, '.') }}</h6>
+      <span>{{ server || 'In Menus' }}</span>
+      <h5>{{ role }}</h5>
     </div>
     <div class="actions">
       <div
@@ -52,6 +54,8 @@ export default defineComponent({
     name: String,
     uuid: String,
     role: String,
+    version: String,
+    server: String,
   },
 
   methods: {
@@ -109,7 +113,7 @@ div.actions > * {
   color: var(--color-light-gray);
 }
 
-div.infos > h5 {
+div.infos > h4 {
   font-weight: 600;
   text-align: left;
   width: 200px;
@@ -118,13 +122,26 @@ div.infos > h5 {
 
 div.infos > p {
   font-size: 16px;
-  width: 400px;
+  width: 350px;
   color: var(--color-gray);
 }
 
 div.infos > h6 {
+  font-size: 16px;
+  width: 100px;
+  color: var(--color-gray);
   font-weight: normal;
-  width: 200px;
+}
+
+div.infos > span {
+  font-size: 12px;
+  width: 100px;
+  color: var(--color-gray);
+}
+
+div.infos > h5 {
+  font-weight: normal;
+  width: 150px;
 }
 
 div.actions {

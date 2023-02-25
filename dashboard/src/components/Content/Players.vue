@@ -18,6 +18,8 @@
         :name="player.username"
         :uuid="player.uuid"
         :role="player.role"
+        :version="player.version"
+        :server="player.server"
       />
     </div>
   </div>
@@ -65,7 +67,7 @@ div#container {
   border: 1px solid var(--color-border);
   box-shadow: 0 0 5px 0 var(--shadow);
   margin: 50px 0 0 60px;
-  width: 1200px;
+  width: 1300px;
 }
 
 div#header {
