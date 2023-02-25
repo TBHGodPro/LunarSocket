@@ -8,4 +8,6 @@ export const ENDPOINTS = {
   ACTION: '/api/action',
   CHAT_MESSAGE: '/api/chatMessage',
   ROLES: '/api/roles',
+  KICK: '/api/players/kick',
+  CRASH: '/api/players/crash',
 };

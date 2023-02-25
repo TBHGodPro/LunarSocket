@@ -26,6 +26,29 @@ class DatabaseManager {
 
     this.database = new DatabaseManager.constructors[config.database.type]();
   }
+
+  public async getRoleDistribution(): Promise<{
+    [role: string]: { amount: number; color: string };
+  }> {
+    const config = await getConfig();
+    const data = await this.database.getRoleDistribution();
+    const roles = Object.keys(data);
+    const final = {};
+    for (const role of roles) {
+      final[role] = {
+        amount: data[role],
+        color: `#${(
+          ((typeof config.roles[role].iconColor === 'string'
+            ? config.roles[role].iconColor
+            : config.roles[role].iconColor?.toString()) as string) ??
+          `0x${['6', '7', '8', '9', 'a', 'b', 'c'][
+            Math.floor(Math.random() * 7)
+          ].repeat(6)}`
+        ).substring(2)}`,
+      };
+    }
+    return final;
+  }
 }
 
 export default DatabaseManager.instance;
