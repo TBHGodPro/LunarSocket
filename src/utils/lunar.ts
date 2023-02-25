@@ -62,8 +62,9 @@ let cosmeticsUpdated = 0;
 export async function getCosmeticsIndex(): Promise<Cosmetic[]> {
   // If it's been more than an hour since last fetch, update
   if (Date.now() - cosmeticsUpdated > 3600000) {
-    cosmeticsIndex = await fetchCosmeticsIndex();
+    // Set the date before fetching just in case multiple people join at the same time and cause this to be ran twice
     cosmeticsUpdated = Date.now();
+    cosmeticsIndex = await fetchCosmeticsIndex();
   }
 
   return cosmeticsIndex;

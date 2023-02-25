@@ -34,7 +34,6 @@ export default defineComponent({
       const valid = await isKeyValid(key);
 
       if (valid) {
-        this.loggedIn = true;
         localStorage.setItem('apiKey', key);
         store.commit('setApiKey', key);
         const connect = () => {
@@ -66,8 +65,11 @@ export default defineComponent({
             const { type, data } = msg;
             switch (type) {
               case 'info':
-                store.commit('setStats', data.stats);
-                store.commit('setPlayers', data.players);
+                this.loggedIn = true;
+                setTimeout(() => {
+                  store.commit('setStats', data.stats);
+                  store.commit('setPlayers', data.players);
+                }, 150);
                 break;
               case 'updateStats':
                 store.state.stats.status = data;
