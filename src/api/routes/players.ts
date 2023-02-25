@@ -34,7 +34,6 @@ playersRouter.post('/crash', auth, (req, res) => {
   const packet = new ForceCrashPacket();
   packet.write({});
   player.writeToClient(packet);
-  player.removePlayer();
   return res.sendStatus(200);
 });
 
