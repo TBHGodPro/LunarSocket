@@ -4,7 +4,7 @@
     <div class="infos">
       <h4>{{ name }}</h4>
       <p>{{ uuid }}</p>
-      <h6>{{ version.substring(1).replace(/_/, '.') }}</h6>
+      <h6>{{ version.substring(1).replace(/_/g, '.') }}</h6>
       <span>{{ server || 'In Menus' }}</span>
       <h5>{{ role }}</h5>
     </div>
