@@ -91,8 +91,8 @@ server.on('connection', async (socket, request) => {
   handshake.Host = 'assetserver.lunarclientprod.com';
 
   // Ignoring players with older/newer protocol versions
-  if (handshake.protocolVersion !== '8')
-    return socket.close(1002, 'Incompatible protocol version, requires 8');
+  if (handshake.protocolVersion !== '9')
+    return socket.close(1002, 'Incompatible protocol version, requires 9');
 
   config = await getConfig();
 

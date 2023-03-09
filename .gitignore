@@ -6,3 +6,4 @@ FileStorage.json
 nodemon.json
 yarn.lock
 storage.json
+.idea/
