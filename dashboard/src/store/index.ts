@@ -43,7 +43,7 @@ export default createStore({
     },
     setStats(state, stats) {
       state.stats = stats;
-      updateGraphs();
+      updateGraphs?.();
       state.stats.uptime = Math.floor(Date.now() / 1000) - state.stats.uptime;
     },
     setPlayers(state, players: Player[]) {

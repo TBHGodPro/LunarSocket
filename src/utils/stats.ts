@@ -41,7 +41,9 @@ setInterval(async () => {
 }, 5 * 60 * 1000); // Every 5 minutes
 
 export async function getLunarLatency() {
-  return await connectedPlayers[0]?.getLatency(true);
+  return (
+    (await connectedPlayers.find((p) => !p.cracked)?.getLatency(true)) ?? 0
+  );
 }
 
 export default function startStats(): void {

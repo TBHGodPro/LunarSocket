@@ -259,7 +259,6 @@ export default defineComponent({
       this.renderRankGraph();
     },
     updateUptime(uptime: any) {
-      console.log(`Uptime changed to ${uptime}`);
       this.uptime = this.secondsToHms(uptime);
       setInterval(
         () =>
@@ -271,12 +270,12 @@ export default defineComponent({
   },
 
   created() {
+    updateGraphs = this.updateGraphs;
     this.updateContainerHeight();
     window.addEventListener('resize', this.updateContainerHeight);
   },
 
   mounted() {
-    updateGraphs = this.updateGraphs;
     this.renderOnlineGraph();
     this.renderRankGraph();
     // @ts-ignore

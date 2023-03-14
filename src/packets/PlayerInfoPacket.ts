@@ -38,10 +38,10 @@ export default class PlayerInfoPacket extends Packet<PlayerInfo> {
     }
 
     this.buf.writeInt(data.plusColor);
+    this.buf.writeBoolean(data.petFlipShoulder);
     this.buf.writeBoolean(data.unknownBooleanB);
     this.buf.writeBoolean(data.unknownBooleanC);
     this.buf.writeBoolean(data.unknownBooleanD);
-    this.buf.writeBoolean(data.unknownBooleanE);
 
     this.buf.finish();
   }
@@ -73,10 +73,10 @@ export default class PlayerInfoPacket extends Packet<PlayerInfo> {
     }
 
     const plusColor = this.buf.readInt();
+    const petFlipShoulder = this.buf.readBoolean();
     const unknownBooleanB = this.buf.readBoolean();
     const unknownBooleanC = this.buf.readBoolean();
     const unknownBooleanD = this.buf.readBoolean();
-    const unknownBooleanE = this.buf.readBoolean();
 
     this.data = {
       uuid,
@@ -89,10 +89,10 @@ export default class PlayerInfoPacket extends Packet<PlayerInfo> {
       scaleHatWithHeadwear,
       adjustableHeightCosmetics,
       plusColor,
+      petFlipShoulder,
       unknownBooleanB,
       unknownBooleanC,
       unknownBooleanD,
-      unknownBooleanE,
     };
   }
 }
@@ -113,8 +113,8 @@ interface PlayerInfo {
   scaleHatWithHeadwear: boolean;
   adjustableHeightCosmetics: { [key: string]: number };
   plusColor: number;
+  petFlipShoulder: boolean;
   unknownBooleanB: boolean;
   unknownBooleanC: boolean;
   unknownBooleanD: boolean;
-  unknownBooleanE: boolean;
 }

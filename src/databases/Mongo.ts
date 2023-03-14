@@ -21,11 +21,13 @@ export default class Mongo extends Database {
 
     this.isConnected = false;
     this.queue = new CallQueue(this.emptyQueue);
-    this.init().catch((reason) => {
-      logger.error('An error occured while initializing Mongo\n', reason);
-      logger.error("Can't proceed without a working database, exiting...");
-      process.exit(1);
-    });
+    this.init()
+      .then(() => this.DBReady())
+      .catch((reason) => {
+        logger.error('An error occured while initializing Mongo\n', reason);
+        logger.error("Can't proceed without a working database, exiting...");
+        process.exit(1);
+      });
   }
 
   private async init(): Promise<void> {

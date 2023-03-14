@@ -28,7 +28,11 @@ export default defineComponent({
       case 'login': {
         this.icon = 'fa-solid fa-arrow-right-to-bracket';
         this.color = '84, 200, 119';
-        this.text = `${this.$props.value} connected`;
+        if (this.$props.value?.startsWith('cracked:')) {
+          this.text = `${this.$props.value.substring(8)} connected (cracked)`;
+        } else {
+          this.text = `${this.$props.value} connected`;
+        }
         break;
       }
       case 'logout': {
@@ -81,6 +85,12 @@ export default defineComponent({
         this.color = '227, 77, 77';
         const date = new Date(Number(this.$props.value));
         this.text = `Server updated at ${date.toLocaleTimeString()}`;
+        break;
+      }
+      case 'player-crash': {
+        this.icon = 'fa-solid fa-skull';
+        this.color = '255, 218, 117';
+        this.text = `${this.$props.value} was crashed`;
         break;
       }
       default:

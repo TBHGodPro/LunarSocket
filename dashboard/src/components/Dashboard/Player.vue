@@ -1,9 +1,12 @@
 <template>
   <div class="container">
-    <img class="avatar" :src="`https://cravatar.eu/avatar/${uuid}`" />
+    <img
+      class="avatar"
+      :src="`https://cravatar.eu/avatar/${cracked ? 'steve' : uuid}`"
+    />
     <div class="infos">
       <h4>{{ name }}</h4>
-      <p>{{ uuid }}</p>
+      <p>{{ cracked ? 'CRACKED' : uuid }}</p>
       <h6>{{ version.substring(1).replace(/_/g, '.') }}</h6>
       <span>{{ server || 'In Menus' }}</span>
       <h5>{{ role }}</h5>
@@ -56,6 +59,7 @@ export default defineComponent({
     role: String,
     version: String,
     server: String,
+    cracked: Boolean,
   },
 
   methods: {
@@ -63,9 +67,14 @@ export default defineComponent({
       const message = prompt(
           `What message do you want to send to ${this.$props.name}?`
       );
-      await sendMessage(this.$props.uuid, message);
+      await sendMessage(
+        this.$props.cracked ? this.$props.name : this.$props.uuid,
+        message
+      );
     },
     async setRole() {
+      if (this.$props.cracked) return this.errorMessage();
+
       const role = prompt(
           `What role do you want to set for ${this.$props.name}?`
       );
@@ -75,13 +84,18 @@ export default defineComponent({
       const confirmed = confirm(
           `Are you sure you want to kick ${this.$props.name} from the WebSocket?\n\n(They will reconnect pretty soon)`
       );
-      if (confirmed) await kick(this.$props.uuid);
+      if (confirmed)
+        await kick(this.$props.cracked ? this.$props.name : this.$props.uuid);
     },
     async crash() {
       const confirmed = confirm(
           `Are you sure you want to crash ${this.$props.name}?`
       );
-      if (confirmed) await crash(this.$props.uuid);
+      if (confirmed)
+        await crash(this.$props.cracked ? this.$props.name : this.$props.uuid);
+    },
+    errorMessage() {
+      alert('This User is on Cracked so you cannot do this action!');
     },
   },
 });

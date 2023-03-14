@@ -1,6 +1,8 @@
+import { once } from 'events';
 import { Server as WebSocketServer } from 'ws';
 import createServer, { connections, emitToDashboard } from './api';
 import { getStats } from './api/routes/stats';
+import { DatabaseManager } from './databases/Manager';
 import Packet from './packets/Packet';
 import Player, { Handshake } from './player/Player';
 import getConfig, { initConfig } from './utils/config';
@@ -34,6 +36,11 @@ server.on('listening', () => {
 });
 
 server.on('connection', async (socket, request) => {
+  if (!DatabaseManager.instance.database.ready)
+    await once(DatabaseManager.instance.database.emitter, 'ready');
+
+  // console.log(request.headers);
+
   if (request.url.includes('dashboard=true')) {
     const query = new URLSearchParams(request.url.split('?')[1]);
     if (query.get('apiKey') === (await getConfig()).api.authorization) {
@@ -49,6 +56,7 @@ server.on('connection', async (socket, request) => {
             role: p.role.name,
             server: p.server,
             version: p.version,
+            cracked: p.cracked,
           })),
         },
         socket
@@ -96,17 +104,37 @@ server.on('connection', async (socket, request) => {
 
   config = await getConfig();
 
-  if (config.whitelist.enabled)
-    if (!config.whitelist.list.includes(handshake.playerId))
-      return socket.close(3000, 'You are not whitelisted');
+  if (
+    config.whitelist.enabled &&
+    !config.whitelist.list.includes(handshake.playerId)
+  )
+    return socket.close(3000, 'You are not whitelisted');
   if (config.blacklist.list.includes(handshake.playerId))
     return socket.close(3000, 'You have been blacklisted.');
 
   // Closing the connection if the player is already connected
-  if (connectedPlayers.find((p) => p.uuid === handshake.playerId))
+  if (
+    connectedPlayers.find(
+      (p) =>
+        !p.cracked &&
+        (p.uuid === handshake.playerId || p.username === handshake.username)
+    )
+  )
     return socket.close(3001, 'Already connected');
 
-  const player = new Player(socket, handshake, await getCosmeticsIndex());
+  // Closing any other connections (probably cracked) with the same username (should be impossible)
+  connectedPlayers
+    .filter(
+      (p) => p.uuid === handshake.playerId || p.username === handshake.username
+    )
+    .forEach((con) => con.removePlayer(3001, 'Already Connected'));
+
+  const player = new Player(
+    socket,
+    handshake,
+    await getCosmeticsIndex(),
+    true
+  );
 
   emitToDashboard('playerAdd', {
     uuid: player.uuid,
@@ -114,6 +142,7 @@ server.on('connection', async (socket, request) => {
     role: player.role.name,
     server: player.server,
     version: player.version,
+    cracked: player.cracked,
   });
   return connectedPlayers.push(player);
 });
@@ -126,7 +155,11 @@ export function broadcast(
   const playerServer = new ServerString(broadcastServer);
 
   connectedPlayers.forEach((p) => {
-    if (broadcastPlayer && p.uuid === broadcastPlayer.uuid) return;
+    if (
+      broadcastPlayer &&
+      (p.uuid === broadcastPlayer.uuid || p.cracked !== broadcastPlayer.cracked)
+    )
+      return;
     if (broadcastServer) {
       if (ServerString.match(playerServer, p.server)) p.writeToClient(data);
     } else p.writeToClient(data);

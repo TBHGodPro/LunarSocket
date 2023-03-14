@@ -160,10 +160,10 @@ Which means lunar sends you only equipped cosmetics_
   scaleHatWithHeadwear: 'boolean',
   adjustableHeightCosmetics: 'HashMap<int, float>',
   plusColor: 'int',
+  petFlipShoulder: 'boolean',
   unknownBooleanB: 'boolean',
   unknownBooleanC: 'boolean',
   unknownBooleanD: 'boolean',
-  unknownBooleanE: 'boolean',
 }
 ```
 

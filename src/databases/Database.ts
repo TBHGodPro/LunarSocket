@@ -1,7 +1,16 @@
+import { EventEmitter } from 'node:stream';
 import { CustomCosmetic } from '../api/routes/customCosmetics';
 import Player, { DatabasePlayer } from '../player/Player';
 
 export default class Database {
+  public ready = false;
+  public emitter = new EventEmitter();
+
+  public DBReady() {
+    this.ready = true;
+    this.emitter.emit('ready');
+  }
+
   // skipcq
   public setPlayer(player: Player): Promise<void> | void {
     console.warn('Database#setPlayer is not implemented');

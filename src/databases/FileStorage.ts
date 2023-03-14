@@ -13,11 +13,16 @@ export default class FileStorage extends Database {
   public constructor() {
     super();
 
-    this.init().catch((reason) => {
-      logger.error('An error occured while initializing FileStorage\n', reason);
-      logger.error("Can't proceed without a working database, exiting...");
-      process.exit(1);
-    });
+    this.init()
+      .then(() => this.DBReady())
+      .catch((reason) => {
+        logger.error(
+          'An error occured while initializing FileStorage\n',
+          reason
+        );
+        logger.error("Can't proceed without a working database, exiting...");
+        process.exit(1);
+      });
   }
 
   private async init(): Promise<void> {

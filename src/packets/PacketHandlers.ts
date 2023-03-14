@@ -35,7 +35,7 @@ import ToggleFriendRequestsPacket from './ToggleFriendRequestsPacket';
 import UpdatePlusColors from './UpdatePlusColors';
 import UpdateVisiblePlayersPacket from './UpdateVisiblePlayersPacket';
 
-const OutgoingPackets = {
+export const OutgoingPackets = {
   giveEmotes: GiveEmotesPacket,
   playEmote: PlayEmotePacket,
   notification: NotificationPacket,
@@ -55,6 +55,29 @@ const OutgoingPackets = {
   chatMessage: ChatMessagePacket,
   updatePlusColors: UpdatePlusColors,
 };
+
+export enum OutgoingPacketIDs {
+  ConsoleMessage = 2,
+  Notification = 3,
+  FriendList = 4,
+  FriendMessage = 5,
+  JoinServer = 6,
+  PendingRequests = 7,
+  PlayerInfo = 8,
+  FriendRequest = 9,
+  ReceiveFriendRequest = 16,
+  RemoveFriend = 17,
+  FriendUpdate = 18,
+  FriendResponse = 21,
+  ForceCrash = 33,
+  TaskListRequest = 35,
+  PlayEmote = 51,
+  GiveEmotes = 57,
+  ChatMessage = 65,
+  HostListRequest = 67,
+  UpdatePlusColors = 73,
+  ClientBan = 1056,
+}
 
 // Outgoing is when a packet is sent by the server to the client
 export class OutgoingPacketHandler extends (EventEmitter as new () => TypedEventEmitter<OutgoingPacketHandlerEvents>) {
@@ -98,7 +121,7 @@ type OutgoingPacketHandlerEvents = {
   ) => void;
 };
 
-const IncomingPackets = {
+export const IncomingPackets = {
   doEmote: DoEmotePacket,
   consoleMessage: ConsoleMessagePacket,
   joinServer: JoinServerPacket,
@@ -116,6 +139,25 @@ const IncomingPackets = {
   updateVisiblePlayers: UpdateVisiblePlayersPacket,
   id71: PacketId71,
 };
+
+export enum IncomingPacketIDs {
+  ConsoleMessage = 2,
+  FriendMessage = 5,
+  JoinServer = 6,
+  FriendRequest = 9,
+  RemoveFriend = 17,
+  ApplyCosmetics = 20,
+  FriendResponse = 21,
+  ToggleFriendRequests = 22,
+  ConstantChanged = 24,
+  TaskList = 36,
+  DoEmote = 39,
+  PlayerInfoRequest = 48,
+  UpdateVisiblePlayers = 50,
+  EquipEmotes = 56,
+  KeepAlive = 64,
+  HostList = 68,
+}
 
 // Incoming is when a packet is sent by the client to the server
 export class IncomingPacketHandler extends (EventEmitter as new () => TypedEventEmitter<IncomingPacketHandlerEvents>) {
@@ -146,8 +188,11 @@ export class IncomingPacketHandler extends (EventEmitter as new () => TypedEvent
     const event = Object.keys(IncomingPackets).find(
       (key) => IncomingPackets[key] === Packet
     );
+
     // @ts-ignore - event is type of string and not keyof IncomingPacketHandlerEvents but it works anyway
-    if (this.listenerCount(event) > 0) this.emit(event, packet);
+    if (!this.player.cracked && this.listenerCount(event) > 0)
+      // @ts-ignore - same thing
+      this.emit(event, packet);
     else this.player.writeToServer(data);
   }
 }

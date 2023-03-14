@@ -1,10 +1,10 @@
 <template>
   <div id="container" :style="`height: ${containerHeight}px`">
     <div id="header">
-      <h3>Log Entries: {{ $store.state.stats.events.length }}</h3>
+      <h3>Log Entries: {{ events.length }}</h3>
       <div>
         <label for="limit">Show </label>
-        <select name="limit" id="limit" @change="updateList()" v-model="limit">
+        <select name="limit" id="limit" v-model="limit">
           <option v-for="option in limitOptions" :key="option" :value="option">
             {{ option }} entries
           </option>
@@ -13,7 +13,7 @@
     </div>
     <div id="content" :style="`height: ${containerHeight - 85}px`">
       <EventComponent
-        v-for="event of events"
+        v-for="event of events.slice(0, limit)"
         :key="event.value"
         :type="event.type"
         :value="event.value"
@@ -30,8 +30,24 @@ export default defineComponent({
   name: 'Logs',
   components: { EventComponent },
   data: () => ({
-    limit: 25,
-    limitOptions: [25, 50, 75, 100, 150, 200, 300, 500, 1000],
+    limit: 200,
+    limitOptions: [
+      25,
+      50,
+      75,
+      100,
+      150,
+      200,
+      300,
+      500,
+      1000,
+      2500,
+      5000,
+      10000,
+      25000,
+      50000,
+      Infinity,
+    ],
     events: [] as { type: string; value: any }[],
     containerHeight: 500,
   }),
@@ -40,18 +56,16 @@ export default defineComponent({
     updateContainerHeight() {
       this.containerHeight = window.innerHeight - 90 - 68 - 25;
     },
-    updateList() {
-      // @ts-ignore
-      this.events = [...this.$store.state.stats.events];
-      this.events.length = this.limit;
-      this.events = this.events.filter((p) => p);
-    },
+  },
+
+  beforeMount() {
+    // @ts-ignore
+    this.events = [...this.$store.state.stats.events];
   },
 
   created() {
     this.updateContainerHeight();
     window.addEventListener('resize', this.updateContainerHeight);
-    this.updateList();
   },
 });
 </script>

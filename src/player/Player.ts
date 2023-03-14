@@ -1,3 +1,4 @@
+import BufWrapper from '@minecraft-js/bufwrapper';
 import { readdir } from 'fs/promises';
 import { join } from 'path';
 import { WebSocket } from 'ws';
@@ -17,6 +18,7 @@ import PlayEmotePacket from '../packets/PlayEmotePacket';
 import PlayerInfoPacket from '../packets/PlayerInfoPacket';
 import CallQueue from '../utils/CallQueue';
 import getConfig from '../utils/config';
+import handleCrackedPlayer from '../utils/crackedProtocol';
 import { registerEvent } from '../utils/events';
 import logger from '../utils/logger';
 import { Cosmetic } from '../utils/lunar';
@@ -44,21 +46,34 @@ export default class Player {
   public lastPlayerInfo: PlayerInfoPacket;
   public commandHandler: CommandHandler;
 
-  private disconnected: boolean;
+  public handshake: Handshake;
+  public cracked: boolean;
+  public crackedMessageHandler: (
+    id: number,
+    data: any,
+    packet: Packet
+  ) => void | Promise<void>;
+  public disconnected: boolean;
   private socket: WebSocket;
   private fakeSocket: WebSocket;
   private fakeSocketAuthed: boolean;
   private outgoingPacketHandler: OutgoingPacketHandler;
-  private incomingPacketHandler: IncomingPacketHandler;
+  public incomingPacketHandler: IncomingPacketHandler;
 
   public constructor(
     socket: WebSocket,
     handshake: Handshake,
-    cosmetics: Cosmetic[]
+    cosmetics: Cosmetic[],
+    cracked: boolean
   ) {
+    this.handshake = handshake;
+
     this.version = handshake.version;
     this.username = handshake.username;
-    this.uuid = handshake.playerId;
+    this.cracked = cracked;
+    this.uuid = this.cracked
+      ? `crackedUser:${handshake.username}`
+      : handshake.playerId;
     this.server = handshake.server;
     this.premium = { real: false, fake: true };
     this.clothCloak = { real: false, fake: true };
@@ -117,99 +132,118 @@ export default class Player {
     });
 
     // Handling disconnection and errors
-    this.socket.on('close', () => {
-      this.removePlayer();
+    this.socket.on('close', (code, reason) => {
+      this.removePlayer(code, reason);
     });
 
-    this.socket.on('error', () => {
-      this.removePlayer();
-    });
+    this.socket.on('error', () => {});
 
     (async () => {
-      await this.restoreFromDatabase(); // Restoring data if it exists
-      await this.updateDatabase(); // Saving data to database
+      if (this.cracked) {
+        const handler = await handleCrackedPlayer(this);
+        if (handler) {
+          this.crackedMessageHandler = handler;
+          await incomingMessageQueue.emptyQueue();
+          this.fakeSocketAuthed = true;
+        }
+      } else {
+        await this.restoreFromDatabase(); // Restoring data if it exists
+        await this.updateDatabase(); // Saving data to database
 
-      const config = await getConfig();
-      this.operator = config.operators.includes(this.uuid);
+        const config = await getConfig();
+        this.operator = config.operators.includes(this.uuid);
 
-      await this.setRole(this.role.name, false);
+        await this.setRole(this.role.name, false);
 
-      const outgoingEvents = await readdir(
-        join(process.cwd(), 'dist', 'player', 'events', 'outgoing')
-      );
-      for (const event of outgoingEvents) {
-        if (!event.endsWith('.js')) continue;
-        this.outgoingPacketHandler.on(
-          // @ts-ignore - Perfectly fine
-          event.replace('.js', ''),
-          async (packet) => {
-            const handler = await import(
-              join(process.cwd(), 'dist', 'player', 'events', 'outgoing', event)
-            );
+        const outgoingEvents = await readdir(
+          join(process.cwd(), 'dist', 'player', 'events', 'outgoing')
+        );
+        for (const event of outgoingEvents) {
+          if (!event.endsWith('.js')) continue;
+          this.outgoingPacketHandler.on(
+            // @ts-ignore - Perfectly fine
+            event.replace('.js', ''),
+            async (packet) => {
+              const handler = await import(
+                join(
+                  process.cwd(),
+                  'dist',
+                  'player',
+                  'events',
+                  'outgoing',
+                  event
+                )
+              );
 
-            handler.default(this, packet);
+              handler.default(this, packet);
+            }
+          );
+        }
+
+        const incomingEvents = await readdir(
+          join(process.cwd(), 'dist', 'player', 'events', 'incoming')
+        );
+        for (const event of incomingEvents) {
+          if (!event.endsWith('.js')) continue;
+          this.incomingPacketHandler.on(
+            // @ts-ignore - Perfectly fine
+            event.replace('.js', ''),
+            async (packet) => {
+              const handler = await import(
+                join(
+                  process.cwd(),
+                  'dist',
+                  'player',
+                  'events',
+                  'incoming',
+                  event
+                )
+              );
+
+              handler.default(this, packet);
+            }
+          );
+        }
+
+        this.fakeSocket = new WebSocket(
+          'wss://assetserver.lunarclientprod.com/connect',
+          {
+            headers: { ...handshake },
           }
         );
-      }
+        this.commandHandler = new CommandHandler(this);
+        logger.log(this.username, 'connected!');
+        registerEvent('login', this.username);
 
-      const incomingEvents = await readdir(
-        join(process.cwd(), 'dist', 'player', 'events', 'incoming')
-      );
-      for (const event of incomingEvents) {
-        if (!event.endsWith('.js')) continue;
-        this.incomingPacketHandler.on(
-          // @ts-ignore - Perfectly fine
-          event.replace('.js', ''),
-          async (packet) => {
-            const handler = await import(
-              join(process.cwd(), 'dist', 'player', 'events', 'incoming', event)
-            );
-
-            handler.default(this, packet);
-          }
-        );
-      }
-
-      this.fakeSocket = new WebSocket(
-        'wss://assetserver.lunarclientprod.com/connect',
-        {
-          headers: { ...handshake },
-        }
-      );
-      this.commandHandler = new CommandHandler(this);
-      logger.log(this.username, 'connected!');
-      registerEvent('login', this.username);
-
-      this.fakeSocket.once('message', async () => {
-        await incomingMessageQueue.emptyQueue();
-        this.fakeSocketAuthed = true;
-      });
-
-      this.fakeSocket.on('message', (data) => {
-        // Trying to handle packet
-        try {
-          this.outgoingPacketHandler.handle(data as Buffer);
-        } catch (error) {
-          logger.error(error);
-          this.writeToClient(data);
-        }
-      });
-      this.fakeSocket.on('close', () => {
-        this.removePlayer();
-      });
-      this.fakeSocket.on('error', () => {
-        this.removePlayer();
-      });
-
-      // After every listeners are registered sending a hi notification
-      setTimeout(async () => {
-        const notification = new NotificationPacket();
-        notification.write({
-          title: '',
-          message: (await getConfig()).welcomeMessage,
+        this.fakeSocket.once('message', async () => {
+          await incomingMessageQueue.emptyQueue();
+          this.fakeSocketAuthed = true;
         });
-        this.writeToClient(notification);
-      }, 1000);
+
+        this.fakeSocket.on('message', (data) => {
+          // Trying to handle packet
+          try {
+            this.outgoingPacketHandler.handle(data as Buffer);
+          } catch (error) {
+            logger.error(error);
+            this.writeToClient(data);
+          }
+        });
+        this.fakeSocket.on('close', (code, reason) => {
+          this.removePlayer(code, reason);
+        });
+        this.fakeSocket.on('error', () => {});
+
+        // After all listeners are registered send a hi notification
+        setTimeout(async () => {
+          const notification = new NotificationPacket();
+          notification.write({
+            title: '',
+            message: (await getConfig()).welcomeMessage || '',
+          });
+          this.writeToClient(notification);
+        }, 2000);
+      }
     })();
   }
 
@@ -325,6 +359,35 @@ export default class Player {
   public writeToServer(data: any | Packet): void {
     if (this.disconnected) return;
 
+    if (this.cracked) {
+      try {
+        if (data instanceof Packet)
+          // @ts-ignore - BRO ITS STILL VOID STFU
+          this.crackedMessageHandler(
+            data.constructor.prototype.id,
+            data.data,
+            data
+          );
+        else {
+          const buf = new BufWrapper(data);
+
+          const id = buf.readVarInt();
+          const Packet = IncomingPacketHandler.packets.find((p) => p.id === id);
+
+          const packet = new Packet(buf);
+          packet.read();
+
+          // @ts-ignore - BRO ITS STILL VOID STFU
+          this.crackedMessageHandler(id, packet.data, packet);
+        }
+      } catch (error) {
+        logger.error(
+          'Error writing to cracked message handler:',
+          error.message
+        );
+      }
+    }
+
     try {
       if (data instanceof Packet) {
         this.fakeSocket.send(data.buf.buffer);
@@ -334,18 +397,18 @@ export default class Player {
     }
   }
 
-  public removePlayer(): void {
+  public removePlayer(code = 1000, reason?: string | Buffer): void {
     if (this.disconnected) return;
     this.disconnected = true;
     logger.log(this.username, 'disconnected!');
     registerEvent('logout', this.username);
     try {
-      this.socket.close(1000);
+      this.socket.close(code, reason);
     } catch (error) {
       this.socket = null;
     }
     try {
-      this.fakeSocket.close(1000);
+      this.fakeSocket.close(code, reason);
     } catch (error) {
       this.fakeSocket = null;
     }

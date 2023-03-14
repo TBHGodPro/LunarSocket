@@ -8,8 +8,11 @@ export default class InstanceStorage extends Database {
 
   public constructor() {
     super();
+    
     this.database = new Map<string, DatabasePlayer>();
     this.customCosmetics = [];
+    
+    this.DBReady()
   }
 
   public setPlayer(player: Player): void {

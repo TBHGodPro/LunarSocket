@@ -10,7 +10,8 @@ export type EventType =
   | 'stop'
   | 'restart'
   | 'kill'
-  | 'update';
+  | 'update'
+  | 'player-crash';
 
 export interface Event {
   type: EventType;

@@ -15,7 +15,7 @@ import Login from './components/Login.vue';
 import Sidebar from './components/Sidebar.vue';
 import Header from './components/Header.vue';
 import Content from './components/Content/Content.vue';
-import { isKeyValid, wsPath } from './api';
+import { fetchPlayers, fetchStats, isKeyValid, wsPath } from './api';
 import store from './store';
 import { HOST } from './constants';
 import { updateGraphs } from './components/Content/Main.vue';
@@ -36,6 +36,13 @@ export default defineComponent({
       if (valid) {
         localStorage.setItem('apiKey', key);
         store.commit('setApiKey', key);
+        const startTime = Date.now();
+        Promise.all([fetchStats(), fetchPlayers()]).then(() => {
+          console.log(
+            `Fetched Stats and Players in ${Date.now() - startTime}ms`
+          );
+          this.loggedIn = true;
+        });
         const connect = () => {
           const ws = new WebSocket(
             `${(HOST || window.location.origin).replace('http', 'ws')}${
@@ -45,7 +52,7 @@ export default defineComponent({
           ws.onerror = (err) => console.error('[WebSocket]', err);
           ws.onclose = () => {
             console.log('[WebSocket]', 'Disconnected');
-            connect();
+            setTimeout(() => connect(), 2000);
           };
           ws.onopen = () => console.log('[WebSocket]', 'Connected');
           // skipcq: JS-0045 its fine stop crying
@@ -65,11 +72,19 @@ export default defineComponent({
             const { type, data } = msg;
             switch (type) {
               case 'info':
+                console.log(
+                  `Recieved Socket Info in ${Date.now() - startTime}ms`
+                );
                 this.loggedIn = true;
-                setTimeout(() => {
+                if (
+                  // @ts-ignore
+                  !this.$store.state.stats.uptime ||
+                  // @ts-ignore
+                  !this.$store.state.players.length
+                ) {
                   store.commit('setStats', data.stats);
                   store.commit('setPlayers', data.players);
-                }, 150);
+                }
                 break;
               case 'updateStats':
                 store.state.stats.status = data;
@@ -126,8 +141,6 @@ export default defineComponent({
                 break;
               }
               case 'event':
-                if (store.state.stats.events.length >= 75)
-                  store.state.stats.events.pop();
                 store.state.stats.events.splice(0, 0, data);
                 break;
               default:

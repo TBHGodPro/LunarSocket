@@ -1,4 +1,4 @@
-import { connectedPlayers } from '..';
+import findPlayer from '../utils/findPlayer';
 import Command from './Command';
 
 const command = new Command('kick', 'Kick someone from the websocket');
@@ -11,7 +11,7 @@ command.setHandler((player, command, args) => {
     return;
   }
 
-  const target = connectedPlayers.find((p) => p.username === args[0]);
+  const target = findPlayer(args[0]);
   if (!target) {
     player.sendConsoleMessage(`Player ${args[0]} not found`);
     return;

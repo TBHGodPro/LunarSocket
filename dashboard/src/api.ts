@@ -36,6 +36,16 @@ export async function sendAction(action: string): Promise<void> {
   });
 }
 
+export async function fetchStats(): Promise<void> {
+  const response = await $fetch(ENDPOINTS.STATS);
+  if (!store.state.stats.uptime) store.commit('setStats', await response.json());
+}
+
+export async function fetchPlayers(): Promise<void> {
+  const response = await $fetch(ENDPOINTS.PLAYERS);
+  if (!store.state.players.length) store.commit('setPlayers', await response.json());
+}
+
 export async function sendMessage(
   player: string,
   message: string
