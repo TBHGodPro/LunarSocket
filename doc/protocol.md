@@ -310,6 +310,20 @@ Note: _yes privacy_
 
 See [implementation](../src/packets/HostListRequest.ts)
 
+## UpdatePlusColors - `73`
+
+Sends the client the colors it is able to 
+use.
+Client Renderered month is based off Array position
+
+```js
+{
+  colors: 'Array<int>';
+}
+```
+
+See [implementation](../src/packets/UpdatePlusColors.ts)
+
 ## ClientBan - `1056`
 
 Sent when you get banned from Lunar Client
@@ -618,21 +632,6 @@ See [implementation](../src/packets/HostListPacket.ts)
 ```
 
 </details>
-
-
-## UpdatePlusColors - `73`
-
-Sends the client the colors it is able to 
-use.
-Client Renderered month is based off Array position
-
-```js
-{
-  colors: 'Array<int>';
-}
-```
-
-See [implementation](../src/packets/UpdatePlusColors.ts)
 
 
 # Unused packets
