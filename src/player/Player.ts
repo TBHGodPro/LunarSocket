@@ -72,7 +72,7 @@ export default class Player {
     this.username = handshake.username;
     this.cracked = cracked;
     this.uuid = this.cracked
-      ? `crackedUser:${handshake.username}`
+      ? `crackedUser:${this.username}`
       : handshake.playerId;
     this.server = handshake.server;
     this.premium = { real: false, fake: true };

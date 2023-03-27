@@ -29,11 +29,14 @@ rolesRouter.patch(
         )}-${i.substr(20)}`;
       const uuid = addDashes(
         (
-          await axios.get(
-            `https://api.mojang.com/users/profiles/minecraft/${request.body.player}`
-          )
-        ).data.id
+          await axios
+            .get(
+              `https://api.mojang.com/users/profiles/minecraft/${request.body.player}`
+            )
+            .catch(() => null)
+        )?.data?.id
       );
+      if (!uuid) return response.sendStatus(404);
       const player = await DatabaseManager.instance.database.getPlayer(uuid);
       if (!player) return response.sendStatus(404);
       if (player.role === request.body.role) return response.sendStatus(304);

@@ -36,9 +36,11 @@ export default async function handleCrackedPlayer(
     if (
       // Fetch whether the username exists
       (
-        await axios.get(
-          `https://api.mojang.com/users/profiles/minecraft/${player.username}`
-        )
+        await axios
+          .get(
+            `https://api.mojang.com/users/profiles/minecraft/${player.username}`
+          )
+          .catch(() => ({ status: 204 }))
       ).status === 204
     ) {
       // It does exist, so add it to the cache

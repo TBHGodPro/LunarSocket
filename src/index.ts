@@ -115,9 +115,7 @@ server.on('connection', async (socket, request) => {
   // Closing the connection if the player is already connected
   if (
     connectedPlayers.find(
-      (p) =>
-        !p.cracked &&
-        (p.uuid === handshake.playerId || p.username === handshake.username)
+      (p) => p.uuid === handshake.playerId || p.username === handshake.username
     )
   )
     return socket.close(3001, 'Already connected');
@@ -129,11 +127,15 @@ server.on('connection', async (socket, request) => {
     )
     .forEach((con) => con.removePlayer(3001, 'Already Connected'));
 
+  const cracked = (getHeader('Authorization') as string)
+    .trim()
+    .startsWith('crackedUser:');
+
   const player = new Player(
     socket,
     handshake,
     await getCosmeticsIndex(),
-    true
+    cracked
   );
 
   emitToDashboard('playerAdd', {
