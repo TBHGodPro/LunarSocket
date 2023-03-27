@@ -67,6 +67,8 @@ export async function getCosmeticsIndex(): Promise<Cosmetic[]> {
     cosmeticsIndex = await fetchCosmeticsIndex();
   }
 
+  while (!cosmeticsIndex) await new Promise((res) => setTimeout(res, 100));
+
   return cosmeticsIndex;
 }
 
