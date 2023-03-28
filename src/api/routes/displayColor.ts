@@ -1,4 +1,6 @@
+import axios from 'axios';
 import { Request, Router } from 'express';
+import { DatabaseManager } from '../../databases/Manager';
 import findPlayer from '../../utils/findPlayer';
 import auth from '../middleware/auth';
 
@@ -16,10 +18,36 @@ displayColorRouter.patch(
       return response.sendStatus(400);
 
     const player = findPlayer(request.body.player);
-    if (!player)
-      return response
-        .status(404)
-        .send('Player not found, make sure the player is connected');
+    // Not Connected
+    if (!player) {
+      const addDashes = (i) =>
+        `${i.substr(0, 8)}-${i.substr(8, 4)}-${i.substr(12, 4)}-${i.substr(
+          16,
+          4
+        )}-${i.substr(20)}`;
+      let uuid = (
+        await axios
+          .get(
+            `https://api.mojang.com/users/profiles/minecraft/${request.body.player}`
+          )
+          .catch(() => null)
+      )?.data?.id;
+      if (!uuid) return response.sendStatus(404);
+      uuid = addDashes(uuid);
+      const player = await DatabaseManager.instance.database.getPlayer(uuid);
+      if (!player) return response.sendStatus(404);
+      if (
+        player.customization.displayColor == request.body.displayColor &&
+        player.customization.displayPlusColor == request.body.displayPlusColor
+      )
+        return response.sendStatus(304);
+      player.customization = {
+        displayColor: request.body.displayColor,
+        displayPlusColor: request.body.displayPlusColor,
+      };
+      await DatabaseManager.instance.database.setPlayerRaw(uuid, player);
+      return response.sendStatus(200);
+    }
 
     const permissions = player.role.data.permissions;
     if (
@@ -39,7 +67,7 @@ displayColorRouter.patch(
 
     player.sendNotification(
       'Customization',
-      'Custom colors updated! Reconnecting...'
+      'Custom Colors Updated! Reconnecting...'
     );
     player.removePlayer();
 

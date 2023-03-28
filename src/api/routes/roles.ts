@@ -21,6 +21,7 @@ rolesRouter.patch(
       return response.sendStatus(400);
 
     const player = findPlayer(request.body.player);
+    // Not Connected OR Was told to be offline
     if (request.body.offline || !player) {
       const addDashes = (i) =>
         `${i.substr(0, 8)}-${i.substr(8, 4)}-${i.substr(12, 4)}-${i.substr(
