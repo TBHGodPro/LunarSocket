@@ -83,7 +83,7 @@ export enum OutgoingPacketIDs {
 export class OutgoingPacketHandler extends (EventEmitter as new () => TypedEventEmitter<OutgoingPacketHandlerEvents>) {
   public static packets = Object.values(OutgoingPackets);
 
-  private player: Player;
+  private readonly player: Player;
 
   public constructor(player: Player) {
     super();
@@ -163,7 +163,7 @@ export enum IncomingPacketIDs {
 export class IncomingPacketHandler extends (EventEmitter as new () => TypedEventEmitter<IncomingPacketHandlerEvents>) {
   public static packets = Object.values(IncomingPackets);
 
-  private player: Player;
+  private readonly player: Player;
 
   public constructor(player: Player) {
     super();
