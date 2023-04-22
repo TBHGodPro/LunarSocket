@@ -7,7 +7,7 @@ const command = new Command(
   'Blacklists a UUID from connecting to the socket'
 );
 
-command.help = `usage: blacklist <uuid>`;
+command.help = 'usage: blacklist <uuid>';
 
 command.setHandler(async (player, command, args) => {
   const playerUuid = args[0];
@@ -19,7 +19,7 @@ command.setHandler(async (player, command, args) => {
     return player.sendConsoleMessage('§cThe UUID you provided isnt valid.');
 
   const config = await getConfig();
-  await editConfig({
+  return await editConfig({
     ...config,
     blacklist: {
       list: [...config.blacklist.list, playerUuid],

@@ -109,7 +109,7 @@ export class OutgoingPacketHandler extends (EventEmitter as new () => TypedEvent
     const event = Object.keys(OutgoingPackets).find(
       (key) => OutgoingPackets[key] === Packet
     );
-    // @ts-ignore - event is type of string and not keyof OutgoingPacketHandlerEvents but it works anyway
+    // @ts-expect-error - event is type of string and not keyof OutgoingPacketHandlerEvents but it works anyway
     if (this.listenerCount(event) > 0) this.emit(event, packet);
     else this.player.writeToClient(data);
   }
@@ -189,9 +189,9 @@ export class IncomingPacketHandler extends (EventEmitter as new () => TypedEvent
       (key) => IncomingPackets[key] === Packet
     );
 
-    // @ts-ignore - event is type of string and not keyof IncomingPacketHandlerEvents but it works anyway
+    // @ts-expect-error - event is type of string and not keyof IncomingPacketHandlerEvents but it works anyway
     if (!this.player.cracked && this.listenerCount(event) > 0)
-      // @ts-ignore - same thing
+      // @ts-expect-error - same thing
       this.emit(event, packet);
     else this.player.writeToServer(data);
   }

@@ -15,11 +15,12 @@ import Login from './components/Login.vue';
 import Sidebar from './components/Sidebar.vue';
 import Header from './components/Header.vue';
 import Content from './components/Content/Content.vue';
-import { fetchPlayers, fetchStats, isKeyValid, wsPath } from './api';
+import { fetchPlayers, fetchStats, isKeyValid } from './api';
 import store from './store';
 import { HOST } from './constants';
 import { updateGraphs } from './components/Content/Main.vue';
 
+// skip-cq
 export let checkKeyAndProceed: (key: string) => Promise<void>;
 
 export default defineComponent({
@@ -78,7 +79,7 @@ export default defineComponent({
                 );
                 this.loggedIn = true;
                 store.commit('setPlayers', data.players);
-                // @ts-ignore
+                // @ts-expect-error
                 if (!this.$store.state.stats.uptime) {
                   store.commit('setStats', data.stats);
                 }
@@ -92,6 +93,7 @@ export default defineComponent({
                     store.state.stats.onlineGraph[data.onlineGraph.key] =
                       data.onlineGraph.value;
                   } else if (data.onlineGraph.action === 'remove') {
+                    // skip-cq
                     delete store.state.stats.onlineGraph[data.onlineGraph.key];
                   }
                 }
@@ -149,6 +151,7 @@ export default defineComponent({
         };
         connect();
       } else {
+        // skip-cq
         alert('Your key is invalid');
         localStorage.removeItem('apiKey');
       }
@@ -157,7 +160,7 @@ export default defineComponent({
 
   async created() {
     checkKeyAndProceed = this.checkKeyAndProceed;
-    // @ts-ignore
+    // @ts-expect-error
     if (!this.$store.state.apiKey) {
       const key = localStorage.getItem('apiKey');
       if (!key) return;

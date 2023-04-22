@@ -8,7 +8,8 @@ export default function findPlayer(
   if (typeof cracked !== 'undefined')
     return connectedPlayers.find(
       (p) =>
-        p.cracked == !!cracked &&
+        // skip-cq
+        p.cracked == Boolean(cracked) &&
         (p.uuid.replace(/-/g, '') === uuidOrUsername.replace(/-/g, '') ||
           p.username === uuidOrUsername)
     );

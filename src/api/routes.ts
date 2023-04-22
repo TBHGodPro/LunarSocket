@@ -11,7 +11,7 @@ export default async function registerRoutes(app: Express): Promise<void> {
       route === 'dashboard.js'
         ? '/dashboard'
         : `/api/${route.replace('.js', '')}`,
-      require(join(__dirname, 'routes', route)).default
+      (await import(join(__dirname, 'routes', route))).default
     );
   }
 

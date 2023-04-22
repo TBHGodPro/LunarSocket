@@ -28,7 +28,7 @@ const server = new WebSocketServer({
   noServer: true,
 });
 
-httpServer.on('upgrade', async (req, socket, head) => {
+httpServer.on('upgrade', (req, socket, head) => {
   const { pathname } = parseURL(req.url);
 
   if (pathname.startsWith('/api/dashboard/server'))

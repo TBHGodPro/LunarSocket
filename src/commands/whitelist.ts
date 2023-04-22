@@ -32,34 +32,30 @@ command.setHandler(async (player, command, args) => {
 
   switch (args[0]) {
     case 'status':
-      player.sendConsoleMessage(
+      return player.sendConsoleMessage(
         `Whitelist is currently ${
           config.whitelist.enabled ? '§aenabled' : '§cdisabled'
         }`
       );
-      break;
 
     case 'on':
       await editConfig({
         ...config,
         whitelist: { ...config.whitelist, enabled: true },
       });
-      player.sendConsoleMessage('Whitelist has been §aenabled');
-      break;
+      return player.sendConsoleMessage('Whitelist has been §aenabled');
 
     case 'off':
       await editConfig({
         ...config,
         whitelist: { ...config.whitelist, enabled: false },
       });
-      player.sendConsoleMessage('Whitelist has been §cdisabled');
-      break;
+      return player.sendConsoleMessage('Whitelist has been §cdisabled');
 
     case 'list':
-      player.sendConsoleMessage(
+      return player.sendConsoleMessage(
         `Players whitelisted: §o${config.whitelist.list.join(', ')}`
       );
-      break;
 
     case 'add':
       if (!args[1]) return invalidValue();
@@ -76,8 +72,9 @@ command.setHandler(async (player, command, args) => {
           list: [...config.whitelist.list, args[1]],
         },
       });
-      player.sendConsoleMessage(`${args[1]} has been added to the whitelist`);
-      break;
+      return player.sendConsoleMessage(
+        `${args[1]} has been added to the whitelist`
+      );
 
     case 'remove':
       if (!args[1]) return invalidValue();
@@ -94,12 +91,11 @@ command.setHandler(async (player, command, args) => {
           list: config.whitelist.list.filter((uuid) => uuid !== args[1]),
         },
       });
-      player.sendConsoleMessage(
+      return player.sendConsoleMessage(
         `${args[1]} has been removed from the whitelist`
       );
-      break;
     default:
-      break;
+      return;
   }
 });
 

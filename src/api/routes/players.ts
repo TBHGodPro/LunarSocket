@@ -104,7 +104,7 @@ playersRouter.get('/:uuid', auth, async (req, res) => {
     if (!player) return res.sendStatus(404);
 
     const config = await getConfig();
-    const roleData = config.roles[player.role] || config.roles['default'];
+    const roleData = config.roles[player.role] || config.roles.default;
 
     return res.status(200).send({
       online: false,

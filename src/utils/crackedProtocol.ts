@@ -20,7 +20,7 @@ const nonExistingUsernames = [];
 export default async function handleCrackedPlayer(
   player: Player
 ): Promise<
-  void | ((id: number, data: any, packet: Packet) => void | Promise<void>)
+  ((id: number, data: any, packet: Packet) => void | Promise<void>) | void
 > {
   player.disconnected = false;
 

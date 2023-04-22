@@ -11,7 +11,7 @@ export default class Mongo extends Database {
   private client: MongoClient;
   private playerCollection: Collection;
   private customCosmeticsCollection: Collection;
-  private queue: CallQueue<
+  private readonly queue: CallQueue<
     { uuid: string; player: DatabasePlayer },
     (player: { uuid: string; player: DatabasePlayer }) => Promise<void>
   >;
@@ -56,6 +56,7 @@ export default class Mongo extends Database {
   }
 
   public async setPlayer(player: Player): Promise<void> {
+    // skip-cq
     return await this.setPlayerRaw(player.uuid, player.getDatabasePlayer());
   }
 
@@ -78,20 +79,22 @@ export default class Mongo extends Database {
           // Removing all fields
           $unset: { color: null, plusColor: null, premium: null },
         }
-      )) as unknown as void;
+      )) as undefined;
     else
       return (await this.playerCollection.insertOne({
         // Mango specific data, used to get the player
         uuid,
         ...player,
-      })) as unknown as void;
+      })) as undefined;
   }
 
   public async getPlayer(uuid: string): Promise<DatabasePlayer> {
+    // skip-cq
     return await this.playerCollection.findOne<DatabasePlayer>({ uuid });
   }
 
   public async getPlayerCount(): Promise<number> {
+    // skip-cq
     return await this.playerCollection.countDocuments();
   }
 

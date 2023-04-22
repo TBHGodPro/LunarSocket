@@ -44,7 +44,7 @@ export default defineComponent({
       case 'role-set': {
         this.icon = 'fa-solid fa-user-gear';
         this.color = '85, 31, 255';
-        // @ts-ignore
+        // @ts-expect-error
         const values = this.$props.value.split(',');
         this.text = `${values[0]}'s role: ${values[1]}`;
         break;

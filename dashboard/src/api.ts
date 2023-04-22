@@ -6,6 +6,7 @@ export async function $fetch(
   options: RequestInit = {},
   headers: HeadersInit = {}
 ) {
+  // skip-cq
   return await fetch(HOST + endpoint, {
     headers: {
       Authorization: store.state.apiKey,
@@ -14,8 +15,6 @@ export async function $fetch(
     ...options,
   });
 }
-
-export let wsPath = '';
 
 export async function isKeyValid(key: string): Promise<boolean> {
   const response = await $fetch(

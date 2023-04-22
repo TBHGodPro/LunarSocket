@@ -7,7 +7,7 @@ const command = new Command(
   'Broadcasts a message to a single role'
 );
 
-command.help = `usage: rolebroadcast <rank> <message>`;
+command.help = 'usage: rolebroadcast <rank> <message>';
 
 command.setHandler(async (player, c, args): Promise<void> => {
   let message = args.slice(1).join(' ');
