@@ -56,7 +56,7 @@ export default class Mongo extends Database {
   }
 
   public async setPlayer(player: Player): Promise<void> {
-    // skip-cq
+    // skipcq
     return await this.setPlayerRaw(player.uuid, player.getDatabasePlayer());
   }
 
@@ -89,12 +89,12 @@ export default class Mongo extends Database {
   }
 
   public async getPlayer(uuid: string): Promise<DatabasePlayer> {
-    // skip-cq
+    // skipcq
     return await this.playerCollection.findOne<DatabasePlayer>({ uuid });
   }
 
   public async getPlayerCount(): Promise<number> {
-    // skip-cq
+    // skipcq
     return await this.playerCollection.countDocuments();
   }
 

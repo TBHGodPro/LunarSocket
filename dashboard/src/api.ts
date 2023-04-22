@@ -6,7 +6,7 @@ export async function $fetch(
   options: RequestInit = {},
   headers: HeadersInit = {}
 ) {
-  // skip-cq
+  // skipcq
   return await fetch(HOST + endpoint, {
     headers: {
       Authorization: store.state.apiKey,

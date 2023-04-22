@@ -17,7 +17,7 @@ export function getLunarMetadata(): Promise<any> {
 export async function getAssetsIndex(): Promise<AssetsIndex> {
   const textures = (await getLunarMetadata()).textures;
 
-  // skip-cq
+  // skipcq
   return await axios.get(textures.indexUrl).then((res) => {
     const files = res.data.split('\n').map((line) => {
       const parts = line.split(' ');
@@ -39,7 +39,7 @@ export async function fetchCosmeticsIndex(): Promise<Cosmetic[]> {
 
   const url = assetsIndex.baseUrl + entry.sha1;
 
-  // skip-cq
+  // skipcq
   return await axios
     .get(url)
     .then((res) => res.data)
@@ -70,7 +70,7 @@ export async function getCosmeticsIndex(): Promise<Cosmetic[]> {
   }
 
   // Use an infinite loop in race cases since its the best we can do without an event emitter
-  // skip-cq
+  // skipcq
   while (!cosmeticsIndex) await new Promise((res) => setTimeout(res, 100));
 
   return cosmeticsIndex;

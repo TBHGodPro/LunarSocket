@@ -20,7 +20,7 @@ import store from './store';
 import { HOST } from './constants';
 import { updateGraphs } from './components/Content/Main.vue';
 
-// skip-cq
+// skipcq
 export let checkKeyAndProceed: (key: string) => Promise<void>;
 
 export default defineComponent({
@@ -93,7 +93,7 @@ export default defineComponent({
                     store.state.stats.onlineGraph[data.onlineGraph.key] =
                       data.onlineGraph.value;
                   } else if (data.onlineGraph.action === 'remove') {
-                    // skip-cq
+                    // skipcq
                     delete store.state.stats.onlineGraph[data.onlineGraph.key];
                   }
                 }
@@ -151,7 +151,7 @@ export default defineComponent({
         };
         connect();
       } else {
-        // skip-cq
+        // skipcq
         alert('Your key is invalid');
         localStorage.removeItem('apiKey');
       }
