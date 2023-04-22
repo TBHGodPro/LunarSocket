@@ -6,6 +6,7 @@ export async function $fetch(
   options: RequestInit = {},
   headers: HeadersInit = {}
 ) {
+  // skipcq
   return await fetch(HOST + endpoint, {
     headers: {
       Authorization: store.state.apiKey,
@@ -15,8 +16,6 @@ export async function $fetch(
   });
 }
 
-export let wsPath = '';
-
 export async function isKeyValid(key: string): Promise<boolean> {
   const response = await $fetch(
     ENDPOINTS.KEY,
@@ -25,8 +24,6 @@ export async function isKeyValid(key: string): Promise<boolean> {
       Authorization: key,
     }
   );
-  if (response.status === 200)
-    await response.json().then((data) => (wsPath = data.wsPath));
   return response.status === 200;
 }
 
@@ -38,12 +35,14 @@ export async function sendAction(action: string): Promise<void> {
 
 export async function fetchStats(): Promise<void> {
   const response = await $fetch(ENDPOINTS.STATS);
-  if (!store.state.stats.uptime) store.commit('setStats', await response.json());
+  if (!store.state.stats.uptime)
+    store.commit('setStats', await response.json());
 }
 
 export async function fetchPlayers(): Promise<void> {
   const response = await $fetch(ENDPOINTS.PLAYERS);
-  if (!store.state.players.length) store.commit('setPlayers', await response.json());
+  if (!store.state.players.length)
+    store.commit('setPlayers', await response.json());
 }
 
 export async function sendMessage(

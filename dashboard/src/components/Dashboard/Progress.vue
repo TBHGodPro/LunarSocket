@@ -36,7 +36,7 @@ export default defineComponent({
   }),
   methods: {
     updateValue() {
-      // @ts-ignore
+      // @ts-expect-error
       this.currentValue = (100 * this.$props.value) / this.$props.max;
     },
   },

@@ -17,12 +17,12 @@ import {
 import PlayEmotePacket from '../packets/PlayEmotePacket';
 import PlayerInfoPacket from '../packets/PlayerInfoPacket';
 import CallQueue from '../utils/CallQueue';
-import getConfig from '../utils/config';
+import { getConfig } from '../utils/config';
 import handleCrackedPlayer from '../utils/crackedProtocol';
 import { registerEvent } from '../utils/events';
 import logger from '../utils/logger';
 import { Cosmetic } from '../utils/lunar';
-import { getRole, Role } from '../utils/roles';
+import { Role, getRole } from '../utils/roles';
 
 export default class Player {
   public version: string;
@@ -57,8 +57,8 @@ export default class Player {
   private socket: WebSocket;
   private fakeSocket: WebSocket;
   private fakeSocketAuthed: boolean;
-  private outgoingPacketHandler: OutgoingPacketHandler;
-  public incomingPacketHandler: IncomingPacketHandler;
+  private readonly outgoingPacketHandler: OutgoingPacketHandler;
+  public readonly incomingPacketHandler: IncomingPacketHandler;
 
   public constructor(
     socket: WebSocket,
@@ -161,7 +161,7 @@ export default class Player {
         for (const event of outgoingEvents) {
           if (!event.endsWith('.js')) continue;
           this.outgoingPacketHandler.on(
-            // @ts-ignore - Perfectly fine
+            // @ts-expect-error - Perfectly fine
             event.replace('.js', ''),
             async (packet) => {
               const handler = await import(
@@ -186,7 +186,7 @@ export default class Player {
         for (const event of incomingEvents) {
           if (!event.endsWith('.js')) continue;
           this.incomingPacketHandler.on(
-            // @ts-ignore - Perfectly fine
+            // @ts-expect-error - Perfectly fine
             event.replace('.js', ''),
             async (packet) => {
               const handler = await import(
@@ -362,7 +362,6 @@ export default class Player {
     if (this.cracked) {
       try {
         if (data instanceof Packet)
-          // @ts-ignore - BRO ITS STILL VOID STFU
           this.crackedMessageHandler(
             data.constructor.prototype.id,
             data.data,
@@ -377,7 +376,6 @@ export default class Player {
           const packet = new Packet(buf);
           packet.read();
 
-          // @ts-ignore - BRO ITS STILL VOID STFU
           this.crackedMessageHandler(id, packet.data, packet);
         }
       } catch (error) {

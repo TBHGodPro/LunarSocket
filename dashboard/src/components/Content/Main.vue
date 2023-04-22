@@ -192,16 +192,16 @@ export default defineComponent({
       return hDisplay + mDisplay + sDisplay;
     },
     renderOnlineGraph() {
-      // @ts-ignore
+      // @ts-expect-error
       const context = this.$refs.onlineGraph.getContext('2d');
       const chart = new Chart(context, {
         type: 'line',
         data: {
-          // @ts-ignore
+          // @ts-expect-error
           labels: Object.keys(this.$store.state.stats.onlineGraph),
           datasets: [
             {
-              // @ts-ignore
+              // @ts-expect-error
               data: Object.values(this.$store.state.stats.onlineGraph),
               borderColor: '#54c877',
               backgroundColor: '#54c87725',
@@ -222,37 +222,37 @@ export default defineComponent({
           },
         },
       });
-      // @ts-ignore
+      // @ts-expect-error
       charts.push(chart);
     },
     renderRankGraph() {
-      // @ts-ignore
+      // @ts-expect-error
       const context = this.$refs.rankGraph.getContext('2d');
       const chart = new Chart(context, {
         type: 'doughnut',
         data: {
-          // @ts-ignore
+          // @ts-expect-error
           labels: Object.keys(this.$store.state.stats.rankRepartition),
           datasets: [
             {
-              // @ts-ignore
+              // @ts-expect-error
               data: Object.values(this.$store.state.stats.rankRepartition).map(
                 (i: any) => i.amount
               ),
               backgroundColor: Object.values(
-                // @ts-ignore
+                // @ts-expect-error
                 this.$store.state.stats.rankRepartition
               ).map((i: any) => i.color),
             },
           ],
         },
       });
-      // @ts-ignore
+      // @ts-expect-error
       charts.push(chart);
     },
     updateGraphs() {
       for (const chart of charts) {
-        // @ts-ignore
+        // @ts-expect-error
         chart.destroy();
       }
       this.renderOnlineGraph();
@@ -278,9 +278,9 @@ export default defineComponent({
   mounted() {
     this.renderOnlineGraph();
     this.renderRankGraph();
-    // @ts-ignore
+    // @ts-expect-error
     if (this.$store.state.stats.uptime == 0) {
-      // @ts-ignore
+      // @ts-expect-error
       const unwatch = this.$store.watch(
         (state: any) => state.stats.uptime,
         (uptime: any) => {
@@ -289,7 +289,7 @@ export default defineComponent({
         }
       );
     }
-    // @ts-ignore
+    // @ts-expect-error
     else this.updateUptime(this.$store.state.stats.uptime);
   },
 

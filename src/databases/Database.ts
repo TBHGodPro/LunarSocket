@@ -3,10 +3,10 @@ import { CustomCosmetic } from '../api/routes/customCosmetics';
 import Player, { DatabasePlayer } from '../player/Player';
 
 export default class Database {
+  public readonly emitter = new EventEmitter();
   public ready = false;
-  public emitter = new EventEmitter();
 
-  public DBReady() {
+  public DBReady(): void {
     this.ready = true;
     this.emitter.emit('ready');
   }

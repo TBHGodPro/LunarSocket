@@ -10,17 +10,16 @@ import PendingRequestsPacket from '../packets/PendingRequestsPacket';
 import PlayEmotePacket from '../packets/PlayEmotePacket';
 import PlayerInfoPacket from '../packets/PlayerInfoPacket';
 import Player from '../player/Player';
-import getConfig from './config';
+import { getConfig } from './config';
 import { registerEvent } from './events';
 import logger from './logger';
 
 const existingUsernames = [];
 const nonExistingUsernames = [];
 
-export default async function handleCrackedPlayer(
-  player: Player
-): Promise<
-  void | ((id: number, data: any, packet: Packet) => void | Promise<void>)
+export default async function handleCrackedPlayer(player: Player): Promise<
+  // skipcq
+  void | ((id: number, data: any, packet: Packet) => void)
 > {
   player.disconnected = false;
 

@@ -59,7 +59,7 @@ export default defineComponent({
   },
 
   beforeMount() {
-    // @ts-ignore
+    // @ts-expect-error
     this.events = [...this.$store.state.stats.events];
   },
 

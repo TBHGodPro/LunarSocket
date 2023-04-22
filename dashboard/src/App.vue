@@ -15,11 +15,12 @@ import Login from './components/Login.vue';
 import Sidebar from './components/Sidebar.vue';
 import Header from './components/Header.vue';
 import Content from './components/Content/Content.vue';
-import { fetchPlayers, fetchStats, isKeyValid, wsPath } from './api';
+import { fetchPlayers, fetchStats, isKeyValid } from './api';
 import store from './store';
 import { HOST } from './constants';
 import { updateGraphs } from './components/Content/Main.vue';
 
+// skipcq
 export let checkKeyAndProceed: (key: string) => Promise<void>;
 
 export default defineComponent({
@@ -45,9 +46,10 @@ export default defineComponent({
         });
         const connect = () => {
           const ws = new WebSocket(
-            `${(HOST || window.location.origin).replace('http', 'ws')}${
-              wsPath.startsWith('/') ? wsPath : `/${wsPath}`
-            }?dashboard=true&apiKey=${store.state.apiKey}`
+            `${(HOST || window.location.origin).replace(
+              'http',
+              'ws'
+            )}/api/dashboard/server?apiKey=${store.state.apiKey}`
           );
           ws.onerror = (err) => console.error('[WebSocket]', err);
           ws.onclose = () => {
@@ -76,14 +78,10 @@ export default defineComponent({
                   `Recieved Socket Info in ${Date.now() - startTime}ms`
                 );
                 this.loggedIn = true;
-                if (
-                  // @ts-ignore
-                  !this.$store.state.stats.uptime ||
-                  // @ts-ignore
-                  !this.$store.state.players.length
-                ) {
+                store.commit('setPlayers', data.players);
+                // @ts-expect-error
+                if (!this.$store.state.stats.uptime) {
                   store.commit('setStats', data.stats);
-                  store.commit('setPlayers', data.players);
                 }
                 break;
               case 'updateStats':
@@ -95,6 +93,7 @@ export default defineComponent({
                     store.state.stats.onlineGraph[data.onlineGraph.key] =
                       data.onlineGraph.value;
                   } else if (data.onlineGraph.action === 'remove') {
+                    // skipcq
                     delete store.state.stats.onlineGraph[data.onlineGraph.key];
                   }
                 }
@@ -152,6 +151,7 @@ export default defineComponent({
         };
         connect();
       } else {
+        // skipcq
         alert('Your key is invalid');
         localStorage.removeItem('apiKey');
       }
@@ -160,7 +160,7 @@ export default defineComponent({
 
   async created() {
     checkKeyAndProceed = this.checkKeyAndProceed;
-    // @ts-ignore
+    // @ts-expect-error
     if (!this.$store.state.apiKey) {
       const key = localStorage.getItem('apiKey');
       if (!key) return;

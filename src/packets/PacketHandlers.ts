@@ -83,13 +83,15 @@ export enum OutgoingPacketIDs {
 export class OutgoingPacketHandler extends (EventEmitter as new () => TypedEventEmitter<OutgoingPacketHandlerEvents>) {
   public static packets = Object.values(OutgoingPackets);
 
-  private player: Player;
+  private readonly player: Player;
 
   public constructor(player: Player) {
+    // skipcq
     super();
     this.player = player;
   }
 
+  // skipcq
   public handle(data: Buffer): void {
     const buf = new BufWrapper(data);
 
@@ -109,7 +111,7 @@ export class OutgoingPacketHandler extends (EventEmitter as new () => TypedEvent
     const event = Object.keys(OutgoingPackets).find(
       (key) => OutgoingPackets[key] === Packet
     );
-    // @ts-ignore - event is type of string and not keyof OutgoingPacketHandlerEvents but it works anyway
+    // @ts-expect-error - event is type of string and not keyof OutgoingPacketHandlerEvents but it works anyway
     if (this.listenerCount(event) > 0) this.emit(event, packet);
     else this.player.writeToClient(data);
   }
@@ -163,13 +165,15 @@ export enum IncomingPacketIDs {
 export class IncomingPacketHandler extends (EventEmitter as new () => TypedEventEmitter<IncomingPacketHandlerEvents>) {
   public static packets = Object.values(IncomingPackets);
 
-  private player: Player;
+  private readonly player: Player;
 
   public constructor(player: Player) {
+    // skipcq
     super();
     this.player = player;
   }
 
+  // skipcq
   public handle(data: Buffer): void {
     const buf = new BufWrapper(data);
 
@@ -189,9 +193,9 @@ export class IncomingPacketHandler extends (EventEmitter as new () => TypedEvent
       (key) => IncomingPackets[key] === Packet
     );
 
-    // @ts-ignore - event is type of string and not keyof IncomingPacketHandlerEvents but it works anyway
+    // @ts-expect-error - event is type of string and not keyof IncomingPacketHandlerEvents but it works anyway
     if (!this.player.cracked && this.listenerCount(event) > 0)
-      // @ts-ignore - same thing
+      // @ts-expect-error - same thing
       this.emit(event, packet);
     else this.player.writeToServer(data);
   }

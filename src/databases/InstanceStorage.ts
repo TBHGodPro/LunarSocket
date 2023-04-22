@@ -3,16 +3,16 @@ import Player, { DatabasePlayer } from '../player/Player';
 import Database from './Database';
 
 export default class InstanceStorage extends Database {
-  private database: Map<string, DatabasePlayer>;
-  private customCosmetics: CustomCosmetic[];
+  private readonly database: Map<string, DatabasePlayer>;
+  private readonly customCosmetics: CustomCosmetic[];
 
   public constructor() {
     super();
-    
+
     this.database = new Map<string, DatabasePlayer>();
     this.customCosmetics = [];
-    
-    this.DBReady()
+
+    this.DBReady();
   }
 
   public setPlayer(player: Player): void {

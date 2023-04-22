@@ -1,8 +1,8 @@
 import { readFile, stat, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { isAbsolute, join } from 'node:path';
 import { CustomCosmetic } from '../api/routes/customCosmetics';
 import Player, { DatabasePlayer } from '../player/Player';
-import getConfig from '../utils/config';
+import { getConfig } from '../utils/config';
 import logger from '../utils/logger';
 import Database from './Database';
 
@@ -28,9 +28,9 @@ export default class FileStorage extends Database {
   private async init(): Promise<void> {
     this.filePath =
       (await getConfig().then((data) =>
-        data.database.config.filePath.startsWith('.')
-          ? join(process.cwd(), data.database.config.filePath)
-          : data.database.config.filePath
+        isAbsolute(data.database.config.filePath)
+          ? data.database.config.filePath
+          : join(process.cwd(), data.database.config.filePath)
       )) || join(process.cwd(), 'storage.json');
     this.file = {
       customCosmetics: [],
@@ -45,7 +45,7 @@ export default class FileStorage extends Database {
   }
 
   private async writeFile(): Promise<void> {
-    await writeFile(this.filePath, JSON.stringify(this.file));
+    await writeFile(this.filePath, JSON.stringify(this.file), 'utf8');
   }
 
   public async setPlayer(player: Player): Promise<void> {

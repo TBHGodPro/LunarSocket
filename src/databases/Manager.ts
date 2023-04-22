@@ -1,4 +1,4 @@
-import getConfig from '../utils/config';
+import { getConfig } from '../utils/config';
 import logger from '../utils/logger';
 import FileStorage from './FileStorage';
 import InstanceStorage from './InstanceStorage';
@@ -22,7 +22,13 @@ class DatabaseManager {
   private async init(): Promise<void> {
     const config = await getConfig();
 
-    logger.log('Using database:', config.database.type);
+    logger.log(
+      'Using database:',
+      config.database.type,
+      config.database.type === 'fileStorage'
+        ? `(${config.database.config.filePath || 'storage.json'})`
+        : ''
+    );
 
     this.database = new DatabaseManager.constructors[config.database.type]();
   }

@@ -76,7 +76,7 @@ export default defineComponent({
       for (const button of this.dashboardButtons) {
         button.selected = button.text === newButton;
         if (button.selected)
-          // @ts-ignore
+          // @ts-expect-error
           this.$store.commit('setActiveTab', button.tab);
       }
     },
