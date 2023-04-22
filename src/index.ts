@@ -1,15 +1,16 @@
 import { once } from 'events';
+import { join } from 'path';
+import { parse as parseURL } from 'url';
 import { Server as WebSocketServer } from 'ws';
-import createServer, { connections, emitToDashboard } from './api';
-import { getStats } from './api/routes/stats';
+import createServer, { dashboardWS, emitToDashboard } from './api';
 import { DatabaseManager } from './databases/Manager';
 import Packet from './packets/Packet';
 import Player, { Handshake } from './player/Player';
-import getConfig, { initConfig } from './utils/config';
+import ServerString from './utils/ServerString';
+import { getConfig, initConfig } from './utils/config';
 import { registerEvent } from './utils/events';
 import logger from './utils/logger';
 import { getCosmeticsIndex } from './utils/lunar';
-import ServerString from './utils/ServerString';
 import startStats from './utils/stats';
 
 console.log(`  _                               _____            _        _   
@@ -24,8 +25,23 @@ export const httpServer = createServer();
 export const isProduction = process.env.LUNARSOCKET_DEBUG !== 'true';
 
 const server = new WebSocketServer({
-  server: httpServer,
-  path: config.server.websocketPath,
+  noServer: true,
+});
+
+httpServer.on('upgrade', async (req, socket, head) => {
+  const { pathname } = parseURL(req.url);
+
+  if (pathname.startsWith('/api/dashboard/server'))
+    dashboardWS.handleUpgrade(req, socket, head, (ws) =>
+      dashboardWS.emit('connection', ws, req)
+    );
+  else if (pathname.startsWith(config.server.websocketPath)) {
+    if (pathname.startsWith(join(config.server.websocketPath, '/cracked')))
+      req.headers.authorization = `crackedUser:${req.headers.username}`;
+    server.handleUpgrade(req, socket, head, (ws) =>
+      server.emit('connection', ws, req)
+    );
+  } else socket.destroy();
 });
 
 server.on('error', (error) => logger.error(error));
@@ -39,31 +55,6 @@ server.on('connection', async (socket, request) => {
   if (!DatabaseManager.instance.database.ready)
     await once(DatabaseManager.instance.database.emitter, 'ready');
 
-  // console.log(request.headers);
-
-  if (request.url.includes('dashboard=true')) {
-    const query = new URLSearchParams(request.url.split('?')[1]);
-    if (query.get('apiKey') === (await getConfig()).api.authorization) {
-      socket.on('close', () => connections.splice(connections.indexOf(socket)));
-      connections.push(socket);
-      return emitToDashboard(
-        'info',
-        {
-          stats: await getStats(),
-          players: connectedPlayers.map((p) => ({
-            uuid: p.uuid,
-            username: p.username,
-            role: p.role.name,
-            server: p.server,
-            version: p.version,
-            cracked: p.cracked,
-          })),
-        },
-        socket
-      );
-    } else if ((await getConfig()).api.enabled) return socket.close(4004);
-    else return socket.close(4001);
-  }
   const getHeader = (name: string) => request.headers[name.toLowerCase()];
 
   const handshake = {} as Handshake;
@@ -115,7 +106,9 @@ server.on('connection', async (socket, request) => {
   // Closing the connection if the player is already connected
   if (
     connectedPlayers.find(
-      (p) => p.uuid === handshake.playerId || p.username === handshake.username
+      (p) =>
+        p.uuid === handshake.playerId ||
+        (p.username === handshake.username && !p.cracked)
     )
   )
     return socket.close(3001, 'Already connected');

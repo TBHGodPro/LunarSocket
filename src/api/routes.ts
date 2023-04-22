@@ -1,27 +1,21 @@
 import { Express } from 'express';
-import actionRouter from './routes/action';
-import broadcastRouter from './routes/broadcast';
-import chatMessageRouter from './routes/chatMessage';
-import customCosmeticsRounter from './routes/customCosmetics';
-import dashboard from './routes/dashboard';
-import displayColorRouter from './routes/displayColor';
-import keyRouter from './routes/key';
-import playersRouter from './routes/players';
-import rolesRouter from './routes/roles';
-import statsRouter from './routes/stats';
+import { readdir } from 'node:fs/promises';
+import { join } from 'node:path';
+import logger from '../utils/logger';
 
-export default function registerRoutes(app: Express): void {
-  app.use('/api/stats', statsRouter);
-  app.use('/api/roles', rolesRouter);
-  app.use('/api/key', keyRouter);
-  app.use('/api/action', actionRouter);
-  app.use('/api/broadcast', broadcastRouter);
-  app.use('/api/chatMessage', chatMessageRouter);
-  app.use('/api/players', playersRouter);
-  app.use('/api/displayColor', displayColorRouter);
-  app.use('/api/customCosmetics', customCosmeticsRounter);
+export default async function registerRoutes(app: Express): Promise<void> {
+  const routes = await readdir(join(__dirname, 'routes'));
 
-  app.use('/dashboard', dashboard);
+  for (const route of routes) {
+    app.use(
+      route === 'dashboard.js'
+        ? '/dashboard'
+        : `/api/${route.replace('.js', '')}`,
+      require(join(__dirname, 'routes', route)).default
+    );
+  }
+
+  logger.log(`Registered ${routes.length} Routes`);
 
   app.get('/', (request, response) => response.sendStatus(200));
 }

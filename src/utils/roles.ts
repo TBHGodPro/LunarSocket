@@ -1,4 +1,4 @@
-import getConfig from './config';
+import { getConfig } from './config';
 
 export interface Role {
   console: boolean;

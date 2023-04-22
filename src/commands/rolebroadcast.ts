@@ -1,5 +1,5 @@
 import { connectedPlayers } from '..';
-import getConfig from '../utils/config';
+import { getConfig } from '../utils/config';
 import Command from './Command';
 
 const command = new Command(

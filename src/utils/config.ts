@@ -29,8 +29,6 @@ export async function getConfig(): Promise<Config> {
   );
 }
 
-export default getConfig;
-
 export function getConfigSync(): Config {
   return mergeObjects(
     defaultConfig,

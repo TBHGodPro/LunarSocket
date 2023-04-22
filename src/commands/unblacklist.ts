@@ -1,5 +1,5 @@
 import checkUUID from '../utils/checkUUID';
-import getConfig, { editConfig } from '../utils/config';
+import { getConfig, editConfig } from '../utils/config';
 import Command from './Command';
 
 const command = new Command(

@@ -2,7 +2,7 @@ import { Collection, MongoClient } from 'mongodb';
 import { CustomCosmetic } from '../api/routes/customCosmetics';
 import Player, { DatabasePlayer } from '../player/Player';
 import CallQueue from '../utils/CallQueue';
-import getConfig from '../utils/config';
+import { getConfig } from '../utils/config';
 import logger from '../utils/logger';
 import Database from './Database';
 

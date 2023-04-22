@@ -17,12 +17,12 @@ import {
 import PlayEmotePacket from '../packets/PlayEmotePacket';
 import PlayerInfoPacket from '../packets/PlayerInfoPacket';
 import CallQueue from '../utils/CallQueue';
-import getConfig from '../utils/config';
+import { getConfig } from '../utils/config';
 import handleCrackedPlayer from '../utils/crackedProtocol';
 import { registerEvent } from '../utils/events';
 import logger from '../utils/logger';
 import { Cosmetic } from '../utils/lunar';
-import { getRole, Role } from '../utils/roles';
+import { Role, getRole } from '../utils/roles';
 
 export default class Player {
   public version: string;

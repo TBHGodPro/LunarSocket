@@ -2,9 +2,11 @@ import { Express } from 'express';
 import { readFileSync } from 'node:fs';
 import * as http from 'node:http';
 import * as https from 'node:https';
-import { WebSocket } from 'ws';
+import { WebSocket, WebSocketServer } from 'ws';
+import { connectedPlayers } from '..';
 import { initConfig } from '../utils/config';
 import initAPI from './api';
+import { getStats } from './routes/stats';
 
 const config = initConfig();
 
@@ -28,6 +30,38 @@ export default function createServer(): http.Server | https.Server {
 
   return server;
 }
+
+export const dashboardWS = new WebSocketServer({
+  noServer: true,
+});
+
+dashboardWS.on('connection', async (socket, request) => {
+  const query = new URLSearchParams(request.url.split('?')[1]);
+  if (!config.api.enabled) return socket.close(4004);
+  else if (query.get('apiKey') !== config.api.authorization)
+    return socket.close(4001);
+  else {
+    socket.on('close', () =>
+      connections.splice(connections.indexOf(socket), 1)
+    );
+    connections.push(socket);
+    return emitToDashboard(
+      'info',
+      {
+        stats: await getStats(),
+        players: connectedPlayers.map((p) => ({
+          uuid: p.uuid,
+          username: p.username,
+          role: p.role.name,
+          server: p.server,
+          version: p.version,
+          cracked: p.cracked,
+        })),
+      },
+      socket
+    );
+  }
+});
 
 export const connections: WebSocket[] = [];
 

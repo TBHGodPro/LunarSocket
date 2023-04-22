@@ -47,7 +47,7 @@ export async function fetchCosmeticsIndex(): Promise<Cosmetic[]> {
         return {
           id: parseInt(parts[0]),
           name: parts[3],
-          animated: Boolean(parts[5]),
+          animated: JSON.parse(parts[5]),
           category: parts[6],
           type: parts[7],
           resource: parts[8],
@@ -67,6 +67,7 @@ export async function getCosmeticsIndex(): Promise<Cosmetic[]> {
     cosmeticsIndex = await fetchCosmeticsIndex();
   }
 
+  // Use an infinite loop in race cases since its the best we can do without an event emitter
   while (!cosmeticsIndex) await new Promise((res) => setTimeout(res, 100));
 
   return cosmeticsIndex;

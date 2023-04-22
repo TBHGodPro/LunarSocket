@@ -45,9 +45,10 @@ export default defineComponent({
         });
         const connect = () => {
           const ws = new WebSocket(
-            `${(HOST || window.location.origin).replace('http', 'ws')}${
-              wsPath.startsWith('/') ? wsPath : `/${wsPath}`
-            }?dashboard=true&apiKey=${store.state.apiKey}`
+            `${(HOST || window.location.origin).replace(
+              'http',
+              'ws'
+            )}/api/dashboard/server?apiKey=${store.state.apiKey}`
           );
           ws.onerror = (err) => console.error('[WebSocket]', err);
           ws.onclose = () => {
@@ -76,14 +77,10 @@ export default defineComponent({
                   `Recieved Socket Info in ${Date.now() - startTime}ms`
                 );
                 this.loggedIn = true;
-                if (
-                  // @ts-ignore
-                  !this.$store.state.stats.uptime ||
-                  // @ts-ignore
-                  !this.$store.state.players.length
-                ) {
+                store.commit('setPlayers', data.players);
+                // @ts-ignore
+                if (!this.$store.state.stats.uptime) {
                   store.commit('setStats', data.stats);
-                  store.commit('setPlayers', data.players);
                 }
                 break;
               case 'updateStats':
