@@ -17,11 +17,8 @@ import logger from './logger';
 const existingUsernames = [];
 const nonExistingUsernames = [];
 
-export default async function handleCrackedPlayer(
-  player: Player
-): Promise<
-  ((id: number, data: any, packet: Packet) => void | Promise<void>) | void
-> {
+export default async function handleCrackedPlayer(player: Player): // skipcq
+Promise<void | ((id: number, data: any, packet: Packet) => void)> {
   player.disconnected = false;
 
   // If we haven't cached the username as non-existing

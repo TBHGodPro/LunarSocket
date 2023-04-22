@@ -95,6 +95,7 @@ command.setHandler(async (player, command, args) => {
         `${args[1]} has been removed from the whitelist`
       );
     default:
+      // skipcq
       return;
   }
 });

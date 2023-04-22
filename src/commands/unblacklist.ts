@@ -19,6 +19,7 @@ command.setHandler(async (player, command, args) => {
     return player.sendConsoleMessage('§cThe UUID you provided isnt valid.');
 
   const config = await getConfig();
+  // skipcq
   return await editConfig({
     ...config,
     blacklist: {

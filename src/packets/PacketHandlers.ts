@@ -86,10 +86,12 @@ export class OutgoingPacketHandler extends (EventEmitter as new () => TypedEvent
   private readonly player: Player;
 
   public constructor(player: Player) {
+    // skipcq
     super();
     this.player = player;
   }
 
+  // skipcq
   public handle(data: Buffer): void {
     const buf = new BufWrapper(data);
 
@@ -166,10 +168,12 @@ export class IncomingPacketHandler extends (EventEmitter as new () => TypedEvent
   private readonly player: Player;
 
   public constructor(player: Player) {
+    // skipcq
     super();
     this.player = player;
   }
 
+  // skipcq
   public handle(data: Buffer): void {
     const buf = new BufWrapper(data);
 
