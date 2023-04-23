@@ -69,8 +69,10 @@ export default class Player {
     this.handshake = handshake;
 
     this.version = handshake.version;
-    this.username = handshake.username;
     this.cracked = cracked;
+    this.username = this.cracked
+      ? handshake.Authorization.replace('crackedUser:', '')
+      : handshake.username;
     this.uuid = this.cracked
       ? `crackedUser:${this.username}`
       : handshake.playerId;

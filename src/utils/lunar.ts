@@ -44,17 +44,20 @@ export async function fetchCosmeticsIndex(): Promise<Cosmetic[]> {
     .get(url)
     .then((res) => res.data)
     .then((data) =>
-      data.split('\n').map((line) => {
-        const parts = line.split(',');
-        return {
-          id: parseInt(parts[0]),
-          name: parts[3],
-          animated: JSON.parse(parts[5]),
-          category: parts[6],
-          type: parts[7],
-          resource: parts[8],
-        };
-      })
+      data
+        .trim()
+        .split('\n')
+        .map((line) => {
+          const parts = line.split(',');
+          return {
+            id: parseInt(parts[0]),
+            name: parts[3],
+            animated: JSON.parse(parts[5]),
+            category: parts[6],
+            type: parts[7],
+            resource: parts[8],
+          };
+        })
     );
 }
 
